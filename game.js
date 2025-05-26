@@ -718,6 +718,7 @@ class Game2048 {
         // Prevent multiple simultaneous moves
         if (this.moveInProgress) return;
         
+        this.moveInProgress = true;
         const previousGrid = JSON.stringify(this.grid);
         const movements = [];
         
@@ -746,6 +747,7 @@ class Game2048 {
                 this.cleanupMergedTiles();
                 this.addNewTile();
                 this.saveGameState();
+                this.moveInProgress = false;
                 
                 if (this.isGameOver()) {
                     setTimeout(() => {
@@ -757,6 +759,7 @@ class Game2048 {
             // No valid move - reset tiles to original positions
             this.history.pop();
             this.resetToInitialPositions();
+            this.moveInProgress = false;
         }
     }
 
