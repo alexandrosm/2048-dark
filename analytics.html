@@ -19,7 +19,7 @@
             left: 20px;
             background: transparent;
             border: none;
-            color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 24px;
             cursor: pointer;
             padding: 10px;
@@ -27,7 +27,7 @@
         }
         
         .back-button:hover {
-            color: rgba(255, 255, 255, 0.3);
+            color: rgba(255, 255, 255, 0.6);
         }
         
         .chart-container {
@@ -51,30 +51,46 @@
         
         .stat {
             margin: 10px;
-            opacity: 0.3;
+            color: rgba(255, 255, 255, 0.8);
         }
         
         .stat-value {
             font-size: 32px;
             font-weight: 100;
-            color: #ff6b00;
+            color: rgba(255, 107, 0, 0.8);
             margin: 10px 0;
         }
         
         .stat-label {
             font-size: 14px;
-            opacity: 0.7;
+            color: rgba(255, 255, 255, 0.6);
         }
         
         h1 {
             font-weight: 100;
-            opacity: 0.3;
+            color: rgba(255, 255, 255, 0.8);
             margin: 20px 0;
         }
         
         .no-data {
-            opacity: 0.3;
+            color: rgba(255, 255, 255, 0.6);
             margin-top: 100px;
+        }
+        
+        /* Dark mode adjustments */
+        body.dark-level-1 .analytics-container {
+            opacity: 0.5;
+        }
+        
+        body.dark-level-2 .analytics-container {
+            opacity: 0.2;
+        }
+        
+        /* Keep back button visible in dark modes */
+        body.dark-level-1 .back-button,
+        body.dark-level-2 .back-button {
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
@@ -116,6 +132,11 @@
         </div>
     </div>
     
+    <script>
+        // Apply dark mode setting from main game
+        const darkMode = localStorage.getItem('2048-darkmode') || '0';
+        document.body.className = `dark-level-${darkMode}`;
+    </script>
     <script src="analytics.js"></script>
 </body>
 </html>

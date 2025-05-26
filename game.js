@@ -3,7 +3,7 @@ class Game2048 {
         this.grid = [];
         this.score = 0;
         this.size = 4;
-        this.darkMode = 0;
+        this.darkMode = parseInt(localStorage.getItem('2048-darkmode') || '0');
         this.tiles = new Map();
         this.tileId = 0;
         this.isDragging = false;
@@ -26,6 +26,9 @@ class Game2048 {
     }
 
     init() {
+        // Apply saved dark mode
+        document.body.className = `dark-level-${this.darkMode}`;
+        
         this.setupResponsiveSizing();
         this.setupGrid();
         this.setupEventListeners();
@@ -1058,6 +1061,7 @@ class Game2048 {
     toggleDarkMode() {
         this.darkMode = (this.darkMode + 1) % 3;
         document.body.className = `dark-level-${this.darkMode}`;
+        localStorage.setItem('2048-darkmode', this.darkMode.toString());
     }
     
     toggleFullscreen() {
