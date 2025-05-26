@@ -458,7 +458,6 @@ class Game2048 {
     }
     
     executeMove(direction, currentX, currentY) {
-        this.moveInProgress = true;
         this.lastExecutedDirection = direction;
         this.waitingForNewDirection = true;
         
@@ -466,17 +465,14 @@ class Game2048 {
         this.move(direction);
         
         // After move completes, reset for next potential move
-        setTimeout(() => {
-            this.moveInProgress = false;
-            
-            // Update drag start position for continuous dragging
-            if (this.isDragging && currentX !== undefined && currentY !== undefined) {
-                // Use the position passed when the move was triggered
+        if (this.isDragging && currentX !== undefined && currentY !== undefined) {
+            setTimeout(() => {
+                // Update drag start position for continuous dragging
                 this.dragStartX = currentX;
                 this.dragStartY = currentY;
                 this.saveInitialPositions();
-            }
-        }, 150); // Wait for move animation to complete
+            }, 150); // Wait for move animation to complete
+        }
     }
 
     previewMove(direction, distance) {
@@ -724,6 +720,9 @@ class Game2048 {
         
         // Save state before move
         this.saveState();
+        
+        // Reset merged state for all tiles
+        this.tiles.forEach(tile => tile.merged = false);
         
         switch(direction) {
             case 'left':
