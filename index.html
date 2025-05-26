@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2048 Dark</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#ff6b00">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="2048">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/icon-192.svg">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="score-container">
+                <div class="score">0</div>
+            </div>
+        </div>
+        <div class="game-container">
+            <div class="game-grid"></div>
+        </div>
+        <div class="controls">
+            <button class="new-game" title="New Game">↻</button>
+            <button class="undo" title="Undo">↶</button>
+            <button class="dark-toggle" title="Toggle Dark Mode">◐</button>
+        </div>
+    </div>
+    <script src="game.js"></script>
+</body>
+</html>

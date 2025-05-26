@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Service Worker</title>
+</head>
+<body>
+    <h1>Clearing Service Worker...</h1>
+    <div id="status"></div>
+    <script>
+        const status = document.getElementById('status');
+        
+        async function clearAll() {
+            // Unregister all service workers
+            if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for(let registration of registrations) {
+                    await registration.unregister();
+                    status.innerHTML += '<p>Unregistered: ' + registration.scope + '</p>';
+                }
+            }
+            
+            // Clear all caches
+            if ('caches' in window) {
+                const cacheNames = await caches.keys();
+                for (const cacheName of cacheNames) {
+                    await caches.delete(cacheName);
+                    status.innerHTML += '<p>Deleted cache: ' + cacheName + '</p>';
+                }
+            }
+            
+            status.innerHTML += '<h2>All cleared! You can close this page and go back to the app.</h2>';
+        }
+        
+        clearAll();
+    </script>
+</body>
+</html>

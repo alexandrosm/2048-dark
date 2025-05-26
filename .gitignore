@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.vite/
+sentry-console-logs.json
+console-commands.json
+*.log
