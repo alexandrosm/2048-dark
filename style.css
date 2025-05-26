@@ -41,6 +41,18 @@ body.dark-level-2 .controls {
     opacity: 0.05;
 }
 
+/* Keep dark toggle button visible in all dark modes */
+.dark-toggle {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+body.dark-level-1 .dark-toggle,
+body.dark-level-2 .dark-toggle {
+    opacity: 1 !important;
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
 .container {
     text-align: center;
     transition: opacity 0.3s ease;
