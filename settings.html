@@ -6,15 +6,28 @@
     <title>2048 Settings</title>
     <link rel="stylesheet" href="style.css">
     <style>
+        /* Override main app styles for settings page */
+        body {
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            min-height: 100vh;
+            height: auto;
+            display: block;
+            padding-top: 60px;
+            touch-action: pan-y !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        
         .settings-container {
             text-align: center;
             padding: 20px;
             max-width: 800px;
             margin: 0 auto;
+            padding-bottom: 40px;
         }
         
         .back-button {
-            position: absolute;
+            position: fixed;
             top: 20px;
             left: 20px;
             background: transparent;
@@ -24,6 +37,7 @@
             cursor: pointer;
             padding: 10px;
             transition: all 0.2s ease;
+            z-index: 1000;
         }
         
         .back-button:hover {
