@@ -60,12 +60,17 @@ body.dark-level-2 .dark-toggle {
 
 .header {
     margin-bottom: 20px;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.header.hidden {
+    transform: translateY(-100%);
+    opacity: 0;
 }
 
 .score-container {
     font-size: 20px;
-    opacity: 0.6;
+    opacity: 0.8;
     font-weight: 100;
     min-width: 150px;
 }
@@ -78,6 +83,7 @@ body.dark-level-2 .dark-toggle {
 .game-container {
     display: inline-block;
     background: #000;
+    position: relative;
 }
 
 .game-grid {
@@ -231,7 +237,12 @@ body.dark-level-2 .tile-2048 { color: rgba(255, 40, 20, 0.28); }
 
 .controls {
     margin-top: 20px;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.controls.hidden {
+    transform: translateY(100%);
+    opacity: 0;
 }
 
 button {
@@ -263,5 +274,59 @@ button:focus {
 :-moz-full-screen .fullscreen,
 :-ms-fullscreen .fullscreen {
     display: none;
+}
+
+/* Game over overlay */
+.game-over-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.game-over-overlay.show {
+    display: flex;
+}
+
+.game-over-message {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.game-over-message h2 {
+    font-size: 36px;
+    font-weight: 100;
+    margin-bottom: 20px;
+    color: rgba(255, 107, 0, 0.8);
+}
+
+.game-over-message .final-score {
+    font-size: 24px;
+    font-weight: 100;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.new-game-overlay {
+    background: rgba(255, 107, 0, 0.2);
+    border: 1px solid rgba(255, 107, 0, 0.4);
+    color: rgba(255, 255, 255, 0.8);
+    padding: 12px 24px;
+    font-size: 18px;
+    font-weight: 100;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.new-game-overlay:hover {
+    background: rgba(255, 107, 0, 0.3);
+    border-color: rgba(255, 107, 0, 0.6);
+    color: rgba(255, 255, 255, 0.9);
 }
 

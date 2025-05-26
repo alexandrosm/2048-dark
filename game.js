@@ -120,6 +120,11 @@ class Game2048 {
         document.querySelector('.fullscreen').addEventListener('click', () => {
             this.toggleFullscreen();
         });
+        
+        document.querySelector('.new-game-overlay').addEventListener('click', () => {
+            this.hideGameOver();
+            this.startNewGame();
+        });
 
         // Touch event handling with real-time preview on whole screen
         
@@ -127,7 +132,16 @@ class Game2048 {
         let lastTapTime = 0;
         const doubleTapThreshold = 300; // milliseconds
         
+        // Two-finger swipe detection for menu toggle
+        let twoFingerStartY = 0;
+        
         document.addEventListener('touchstart', (e) => {
+            // Check for two-finger touch
+            if (e.touches.length === 2) {
+                twoFingerStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                return;
+            }
+            
             // Don't prevent default if touching a button
             const target = e.target;
             if (target.tagName === 'BUTTON' || target.closest('button')) {
@@ -156,6 +170,24 @@ class Game2048 {
         }, { passive: false });
 
         document.addEventListener('touchmove', (e) => {
+            // Handle two-finger swipe
+            if (e.touches.length === 2) {
+                const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const deltaY = currentY - twoFingerStartY;
+                
+                if (Math.abs(deltaY) > 50) { // Threshold for swipe
+                    if (deltaY > 0) {
+                        // Swipe down - hide menu
+                        this.toggleMenu(false);
+                    } else {
+                        // Swipe up - show menu
+                        this.toggleMenu(true);
+                    }
+                    twoFingerStartY = currentY; // Reset for continuous swipes
+                }
+                return;
+            }
+            
             // Only prevent default if we're actively dragging the game
             if (this.isDragging) {
                 e.preventDefault();
@@ -668,7 +700,7 @@ class Game2048 {
                 
                 if (this.isGameOver()) {
                     setTimeout(() => {
-                        alert(`Game Over! Score: ${this.score}`);
+                        this.showGameOver();
                     }, 300);
                 }
             }, 150);
@@ -1034,6 +1066,35 @@ class Game2048 {
                 document.msExitFullscreen();
             }
         }
+    }
+    
+    toggleMenu(show) {
+        const header = document.querySelector('.header');
+        const controls = document.querySelector('.controls');
+        
+        if (show) {
+            header.classList.remove('hidden');
+            controls.classList.remove('hidden');
+        } else {
+            header.classList.add('hidden');
+            controls.classList.add('hidden');
+        }
+    }
+    
+    showGameOver() {
+        const overlay = document.querySelector('.game-over-overlay');
+        const finalScore = document.querySelector('.final-score');
+        
+        finalScore.textContent = `Final Score: ${this.score}`;
+        overlay.classList.add('show');
+        
+        // Save the completed game
+        this.saveCompletedGame();
+    }
+    
+    hideGameOver() {
+        const overlay = document.querySelector('.game-over-overlay');
+        overlay.classList.remove('show');
     }
     
     loadHighScore() {
