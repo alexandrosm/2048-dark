@@ -138,7 +138,14 @@ class Game2048 {
         document.addEventListener('touchstart', (e) => {
             // Check for two-finger touch
             if (e.touches.length === 2) {
+                this.isDragging = false; // Disable tile dragging
                 twoFingerStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                return;
+            }
+            
+            // Only allow single finger drag
+            if (e.touches.length !== 1) {
+                this.isDragging = false;
                 return;
             }
             
@@ -172,6 +179,12 @@ class Game2048 {
         document.addEventListener('touchmove', (e) => {
             // Handle two-finger swipe
             if (e.touches.length === 2) {
+                // If we were dragging, reset tile positions
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.resetToInitialPositions();
+                }
+                
                 const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
                 const deltaY = currentY - twoFingerStartY;
                 
@@ -184,6 +197,15 @@ class Game2048 {
                         this.toggleMenu(true);
                     }
                     twoFingerStartY = currentY; // Reset for continuous swipes
+                }
+                return;
+            }
+            
+            // Stop dragging if more than one finger
+            if (e.touches.length !== 1) {
+                if (this.isDragging) {
+                    this.isDragging = false;
+                    this.resetToInitialPositions();
                 }
                 return;
             }
