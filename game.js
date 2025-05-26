@@ -20,13 +20,71 @@ class Game2048 {
         this.waitingForNewDirection = false;
         this.highScore = this.loadHighScore();
         this.undoCount = 0;
+        this.cellSize = 70; // Default value
+        this.gapSize = 12; // Default value
         this.init();
     }
 
     init() {
+        this.setupResponsiveSizing();
         this.setupGrid();
         this.setupEventListeners();
         this.startNewGame();
+    }
+    
+    setupResponsiveSizing() {
+        const updateSizes = () => {
+            const vw = Math.min(window.innerWidth, window.innerHeight);
+            const maxBoardSize = Math.min(vw * 0.9, 500); // 90% of viewport, max 500px
+            const cellCount = 4;
+            const gapRatio = 0.15; // gap is 15% of cell size
+            
+            // Calculate cell size accounting for gaps
+            const totalGapRatio = gapRatio * (cellCount - 1);
+            const cellSize = Math.floor(maxBoardSize / (cellCount + totalGapRatio));
+            const gapSize = Math.floor(cellSize * gapRatio);
+            
+            // Calculate font sizes
+            const fontSize = Math.floor(cellSize * 0.45);
+            const fontSizeSmall = Math.floor(cellSize * 0.4);
+            const fontSizeTiny = Math.floor(cellSize * 0.35);
+            
+            // Set CSS variables
+            document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
+            document.documentElement.style.setProperty('--gap-size', `${gapSize}px`);
+            document.documentElement.style.setProperty('--font-size', `${fontSize}px`);
+            document.documentElement.style.setProperty('--font-size-small', `${fontSizeSmall}px`);
+            document.documentElement.style.setProperty('--font-size-tiny', `${fontSizeTiny}px`);
+            
+            // Store for easy access
+            this.cellSize = cellSize;
+            this.gapSize = gapSize;
+            
+            // Update tile positions if game is already running
+            if (this.tiles.size > 0) {
+                this.updateAllTilePositions();
+            }
+        };
+        
+        updateSizes();
+        window.addEventListener('resize', updateSizes);
+        
+        // Also update on orientation change
+        window.addEventListener('orientationchange', () => {
+            setTimeout(updateSizes, 100);
+        });
+    }
+    
+    getTileOffset(position) {
+        return position * (this.cellSize + this.gapSize);
+    }
+    
+    updateAllTilePositions() {
+        this.tiles.forEach(tile => {
+            tile.element.style.transition = 'none';
+            tile.element.style.left = `${this.getTileOffset(tile.col)}px`;
+            tile.element.style.top = `${this.getTileOffset(tile.row)}px`;
+        });
     }
 
     setupGrid() {
@@ -344,7 +402,7 @@ class Game2048 {
     }
 
     previewMove(direction, distance) {
-        const maxDistance = 82 * 3; // Maximum movement is 3 tiles
+        const maxDistance = this.getTileOffset(3); // Maximum movement is 3 tiles
         const moveRatio = Math.min(distance / maxDistance, 1);
         
         this.tiles.forEach((tile, id) => {
@@ -359,10 +417,10 @@ class Game2048 {
             let newTop = initial.top;
             
             if (direction === 'left' || direction === 'right') {
-                const deltaX = (finalPos.col * 82) - initial.left;
+                const deltaX = this.getTileOffset(finalPos.col) - initial.left;
                 newLeft = initial.left + (deltaX * moveRatio);
             } else {
-                const deltaY = (finalPos.row * 82) - initial.top;
+                const deltaY = this.getTileOffset(finalPos.row) - initial.top;
                 newTop = initial.top + (deltaY * moveRatio);
             }
             
@@ -531,8 +589,8 @@ class Game2048 {
         const tile = document.createElement('div');
         tile.classList.add('tile', `tile-${value}`);
         tile.textContent = value;
-        tile.style.left = `${col * 82}px`;
-        tile.style.top = `${row * 82}px`;
+        tile.style.left = `${this.getTileOffset(col)}px`;
+        tile.style.top = `${this.getTileOffset(row)}px`;
         tile.dataset.row = row;
         tile.dataset.col = col;
         gameGrid.appendChild(tile);
@@ -624,8 +682,8 @@ class Game2048 {
             // Ensure smooth transition even if tile is already at preview position
             const currentLeft = parseFloat(tile.element.style.left);
             const currentTop = parseFloat(tile.element.style.top);
-            const targetLeft = newCol * 82;
-            const targetTop = newRow * 82;
+            const targetLeft = this.getTileOffset(newCol);
+            const targetTop = this.getTileOffset(newRow);
             
             // Only animate if there's actual movement needed
             if (Math.abs(currentLeft - targetLeft) > 0.1 || Math.abs(currentTop - targetTop) > 0.1) {

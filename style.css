@@ -70,9 +70,9 @@ body.dark-level-2 .controls {
 
 .game-grid {
     display: grid;
-    grid-template-columns: repeat(4, 70px);
-    grid-template-rows: repeat(4, 70px);
-    gap: 12px;
+    grid-template-columns: repeat(4, var(--cell-size, 70px));
+    grid-template-rows: repeat(4, var(--cell-size, 70px));
+    gap: var(--gap-size, 12px);
     background: #000;
     position: relative;
 }
@@ -81,7 +81,7 @@ body.dark-level-2 .controls {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 32px;
+    font-size: var(--font-size, 32px);
     font-weight: 100;
     transition: all 0.15s ease;
     position: relative;
@@ -128,31 +128,31 @@ body.dark-level-2 .controls {
 
 .tile-128 {
     color: rgba(255, 120, 60, 0.7);
-    font-size: 28px;
+    font-size: var(--font-size-small, 28px);
     animation: appear 0.3s ease;
 }
 
 .tile-256 {
     color: rgba(255, 100, 50, 0.75);
-    font-size: 28px;
+    font-size: var(--font-size-small, 28px);
     animation: appear 0.3s ease;
 }
 
 .tile-512 {
     color: rgba(255, 80, 40, 0.8);
-    font-size: 28px;
+    font-size: var(--font-size-small, 28px);
     animation: appear 0.3s ease;
 }
 
 .tile-1024 {
     color: rgba(255, 60, 30, 0.85);
-    font-size: 24px;
+    font-size: var(--font-size-tiny, 24px);
     animation: appear 0.3s ease;
 }
 
 .tile-2048 {
     color: rgba(255, 40, 20, 0.9);
-    font-size: 24px;
+    font-size: var(--font-size-tiny, 24px);
     animation: appear 0.3s ease, glow 2s ease infinite;
 }
 
@@ -181,12 +181,12 @@ body.dark-level-2 .controls {
 
 .tile {
     position: absolute;
-    width: 70px;
-    height: 70px;
+    width: var(--cell-size, 70px);
+    height: var(--cell-size, 70px);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 32px;
+    font-size: var(--font-size, 32px);
     font-weight: 100;
     transition: left 0.15s ease, top 0.15s ease;
     background: transparent;
@@ -245,26 +245,3 @@ button:focus {
     outline: none;
 }
 
-@media (max-width: 600px) {
-    .game-grid {
-        grid-template-columns: repeat(4, 60px);
-        grid-template-rows: repeat(4, 60px);
-        gap: 10px;
-        padding: 6px;
-    }
-    
-    .grid-cell {
-        font-size: 28px;
-    }
-    
-    .tile-128,
-    .tile-256,
-    .tile-512 {
-        font-size: 24px;
-    }
-    
-    .tile-1024,
-    .tile-2048 {
-        font-size: 20px;
-    }
-}
