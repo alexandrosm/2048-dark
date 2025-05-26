@@ -297,8 +297,13 @@ class Game2048 {
             this.lastExecutedDirection = null;
             this.waitingForNewDirection = false;
             
+            // Always reset tiles if we have preview positions and no move is in progress
+            if (this.previewPositions.size > 0 && !this.moveInProgress) {
+                this.resetToInitialPositions();
+            }
+            
             // If we haven't executed any moves during continuous drag
-            if (!this.continuousDrag) {
+            if (!this.continuousDrag && !this.moveInProgress) {
                 const endX = e.changedTouches[0].clientX;
                 const endY = e.changedTouches[0].clientY;
                 const dx = endX - this.dragStartX;
@@ -710,6 +715,9 @@ class Game2048 {
     }
 
     move(direction) {
+        // Prevent multiple simultaneous moves
+        if (this.moveInProgress) return;
+        
         const previousGrid = JSON.stringify(this.grid);
         const movements = [];
         
@@ -746,8 +754,9 @@ class Game2048 {
                 }
             }, 150);
         } else {
-            // Remove the saved state if no move was made
+            // No valid move - reset tiles to original positions
             this.history.pop();
+            this.resetToInitialPositions();
         }
     }
 
