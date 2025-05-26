@@ -1,11 +1,11 @@
-const CACHE_NAME = '2048-dark-v11';
+const CACHE_NAME = '2048-dark-v12';
 const urlsToCache = [
   '/',
   '/index.html',
   '/style.css',
   '/game.js',
-  '/analytics.html',
-  '/analytics.js'
+  '/settings.html',
+  '/settings.js'
 ];
 
 // Install service worker and cache resources

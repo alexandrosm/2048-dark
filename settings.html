@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2048 Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .settings-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .back-button:hover {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .settings-section {
+            margin: 40px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        
+        .slider-container {
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        
+        .slider-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: 100;
+        }
+        
+        .slider-value {
+            color: rgba(255, 107, 0, 0.8);
+            font-size: 24px;
+            font-weight: 100;
+            margin: 10px 0;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            border-radius: 2px;
+            margin: 20px 0;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 107, 0, 0.8);
+            cursor: pointer;
+            border-radius: 50%;
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 107, 0, 0.8);
+            cursor: pointer;
+            border-radius: 50%;
+            border: none;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 40px 0;
+        }
+        
+        #chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            margin: 10px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 100;
+            color: rgba(255, 107, 0, 0.8);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        h1, h2 {
+            font-weight: 100;
+            color: rgba(255, 255, 255, 0.8);
+            margin: 20px 0;
+        }
+        
+        .no-data {
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 100px;
+        }
+        
+        /* Dark mode adjustments */
+        body.dark-level-1 .settings-container {
+            opacity: 0.5;
+        }
+        
+        body.dark-level-2 .settings-container {
+            opacity: 0.2;
+        }
+        
+        /* Keep back button visible in dark modes */
+        body.dark-level-1 .back-button,
+        body.dark-level-2 .back-button {
+            opacity: 1;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">←</button>
+    
+    <div class="settings-container">
+        <h1>Settings</h1>
+        
+        <div class="settings-section">
+            <h2>Movement Sensitivity</h2>
+            <div class="slider-container">
+                <div class="slider-label">Swipe Multiplier</div>
+                <div class="slider-value" id="multiplier-value">3.5x</div>
+                <input type="range" id="multiplier-slider" min="1" max="6" step="0.1" value="3.5">
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
+                    Higher values = more sensitive swipes
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2>Performance Analytics</h2>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="total-games">0</div>
+                    <div class="stat-label">Games Played</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="avg-score">0</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="best-score">0</div>
+                    <div class="stat-label">Best Score</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="trend">-</div>
+                    <div class="stat-label">7-Day Trend</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="avg-undos">0</div>
+                    <div class="stat-label">Avg Undos</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <canvas id="chart"></canvas>
+            </div>
+            
+            <div class="no-data" id="no-data" style="display: none;">
+                No games recorded yet. Play some games to see your analytics!
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Apply dark mode setting from main game
+        const darkMode = localStorage.getItem('2048-darkmode') || '0';
+        document.body.className = `dark-level-${darkMode}`;
+        
+        // Handle multiplier slider
+        const slider = document.getElementById('multiplier-slider');
+        const valueDisplay = document.getElementById('multiplier-value');
+        
+        // Load saved multiplier
+        const savedMultiplier = localStorage.getItem('2048-multiplier') || '3.5';
+        slider.value = savedMultiplier;
+        valueDisplay.textContent = `${savedMultiplier}x`;
+        
+        // Update on change
+        slider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            valueDisplay.textContent = `${value}x`;
+            localStorage.setItem('2048-multiplier', value);
+        });
+    </script>
+    <script src="settings.js"></script>
+</body>
+</html>

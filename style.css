@@ -18,6 +18,7 @@ body {
     user-select: none;
     overflow: hidden;
     font-weight: 100;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
 body.dark-level-0 {
@@ -70,7 +71,7 @@ body.dark-level-2 .dark-toggle {
 
 .score-container {
     font-size: 20px;
-    opacity: 0.8;
+    opacity: 0.9;
     font-weight: 100;
     min-width: 150px;
 }

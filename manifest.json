@@ -3,11 +3,16 @@
   "short_name": "2048",
   "description": "A minimal 2048 game with dark mode",
   "start_url": "/",
-  "display": "standalone",
-  "display_override": ["fullscreen", "minimal-ui"],
+  "scope": "/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone", "minimal-ui"],
   "background_color": "#000000",
-  "theme_color": "#ff6b00",
-  "orientation": "portrait",
+  "theme_color": "#000000",
+  "orientation": "any",
+  "categories": ["games", "puzzle"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/icon-192.svg",
@@ -20,6 +25,15 @@
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Game",
+      "short_name": "New",
+      "description": "Start a new game",
+      "url": "/?new=true",
+      "icons": []
     }
   ]
 }

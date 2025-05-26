@@ -10,7 +10,7 @@ class Game2048 {
         this.dragStartX = 0;
         this.dragStartY = 0;
         this.dragThreshold = 50;
-        this.dragMultiplier = 3.5;
+        this.dragMultiplier = parseFloat(localStorage.getItem('2048-multiplier') || '3.5');
         this.previewPositions = new Map();
         this.history = [];
         this.autoReloadInterval = null;
@@ -33,9 +33,17 @@ class Game2048 {
         this.setupGrid();
         this.setupEventListeners();
         
-        // Try to load saved game state, otherwise start new game
-        if (!this.loadGameState()) {
+        // Check if launched from shortcut to start new game
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('new') === 'true') {
             this.startNewGame();
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        } else {
+            // Try to load saved game state, otherwise start new game
+            if (!this.loadGameState()) {
+                this.startNewGame();
+            }
         }
     }
     
@@ -120,8 +128,8 @@ class Game2048 {
             this.undo();
         });
         
-        document.querySelector('.analytics').addEventListener('click', () => {
-            window.location.href = 'analytics.html';
+        document.querySelector('.settings').addEventListener('click', () => {
+            window.location.href = 'settings.html';
         });
         
         document.querySelector('.fullscreen').addEventListener('click', () => {
