@@ -32,7 +32,11 @@ class Game2048 {
         this.setupResponsiveSizing();
         this.setupGrid();
         this.setupEventListeners();
-        this.startNewGame();
+        
+        // Try to load saved game state, otherwise start new game
+        if (!this.loadGameState()) {
+            this.startNewGame();
+        }
     }
     
     setupResponsiveSizing() {
@@ -643,6 +647,9 @@ class Game2048 {
         this.updateScore();
         this.addNewTile();
         this.addNewTile();
+        
+        // Clear saved state
+        localStorage.removeItem('2048-gamestate');
     }
 
     createTileElement(value, row, col) {
@@ -722,6 +729,7 @@ class Game2048 {
             setTimeout(() => {
                 this.cleanupMergedTiles();
                 this.addNewTile();
+                this.saveGameState();
                 
                 if (this.isGameOver()) {
                     setTimeout(() => {
@@ -1130,6 +1138,60 @@ class Game2048 {
     
     saveHighScore() {
         localStorage.setItem('2048-highscore', this.highScore.toString());
+    }
+    
+    saveGameState() {
+        const gameState = {
+            grid: this.grid,
+            score: this.score,
+            tiles: Array.from(this.tiles.values()).map(tile => ({
+                id: tile.id,
+                value: tile.value,
+                row: tile.row,
+                col: tile.col
+            })),
+            tileId: this.tileId,
+            history: this.history,
+            undoCount: this.undoCount
+        };
+        localStorage.setItem('2048-gamestate', JSON.stringify(gameState));
+    }
+    
+    loadGameState() {
+        const saved = localStorage.getItem('2048-gamestate');
+        if (!saved) return false;
+        
+        try {
+            const gameState = JSON.parse(saved);
+            this.grid = gameState.grid;
+            this.score = gameState.score;
+            this.tileId = gameState.tileId;
+            this.history = gameState.history || [];
+            this.undoCount = gameState.undoCount || 0;
+            
+            // Clear existing tiles
+            this.tiles.forEach(tile => tile.element.remove());
+            this.tiles.clear();
+            
+            // Recreate tiles
+            gameState.tiles.forEach(tileData => {
+                const tileElement = this.createTileElement(tileData.value, tileData.row, tileData.col);
+                this.tiles.set(tileData.id, {
+                    id: tileData.id,
+                    value: tileData.value,
+                    row: tileData.row,
+                    col: tileData.col,
+                    element: tileElement,
+                    merged: false
+                });
+            });
+            
+            this.updateScore();
+            return true;
+        } catch (e) {
+            console.error('Failed to load game state:', e);
+            return false;
+        }
     }
     
     saveCompletedGame() {
