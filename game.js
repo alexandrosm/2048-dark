@@ -116,6 +116,10 @@ class Game2048 {
         document.querySelector('.analytics').addEventListener('click', () => {
             window.location.href = 'analytics.html';
         });
+        
+        document.querySelector('.fullscreen').addEventListener('click', () => {
+            this.toggleFullscreen();
+        });
 
         // Touch event handling with real-time preview on whole screen
         
@@ -1000,6 +1004,36 @@ class Game2048 {
     toggleDarkMode() {
         this.darkMode = (this.darkMode + 1) % 3;
         document.body.className = `dark-level-${this.darkMode}`;
+    }
+    
+    toggleFullscreen() {
+        if (!document.fullscreenElement && 
+            !document.webkitFullscreenElement && 
+            !document.mozFullScreenElement && 
+            !document.msFullscreenElement) {
+            // Enter fullscreen
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        } else {
+            // Exit fullscreen
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+        }
     }
     
     loadHighScore() {

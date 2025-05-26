@@ -257,3 +257,11 @@ button:focus {
     outline: none;
 }
 
+/* Hide fullscreen button when in fullscreen mode */
+:fullscreen .fullscreen,
+:-webkit-full-screen .fullscreen,
+:-moz-full-screen .fullscreen,
+:-ms-fullscreen .fullscreen {
+    display: none;
+}
+
