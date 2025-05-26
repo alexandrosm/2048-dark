@@ -78,6 +78,7 @@ class Analytics {
         // Get dark mode level for opacity adjustments
         const darkMode = parseInt(localStorage.getItem('2048-darkmode') || '0');
         const opacityMultiplier = darkMode === 2 ? 0.3 : darkMode === 1 ? 0.6 : 1;
+        const isBrightMode = darkMode === 3;
         
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -96,7 +97,8 @@ class Analytics {
         const timeRange = maxTime - minTime || 1;
         
         // Draw axes
-        this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.1 * opacityMultiplier})`;
+        const axisColor = isBrightMode ? '119, 110, 101' : '255, 255, 255';
+        this.ctx.strokeStyle = `rgba(${axisColor}, ${0.1 * opacityMultiplier})`;
         this.ctx.lineWidth = 1;
         
         // Y-axis
@@ -118,7 +120,7 @@ class Analytics {
         this.ctx.stroke();
         
         // Draw grid lines and labels
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${0.2 * opacityMultiplier})`;
+        this.ctx.fillStyle = `rgba(${axisColor}, ${0.2 * opacityMultiplier})`;
         this.ctx.font = '12px -apple-system, BlinkMacSystemFont, sans-serif';
         
         // Y-axis labels
@@ -127,19 +129,20 @@ class Analytics {
             const score = Math.round(maxScore * (1 - i / 5));
             
             // Grid line
-            this.ctx.strokeStyle = `rgba(255, 255, 255, ${0.05 * opacityMultiplier})`;
+            this.ctx.strokeStyle = `rgba(${axisColor}, ${0.05 * opacityMultiplier})`;
             this.ctx.beginPath();
             this.ctx.moveTo(padding, y);
             this.ctx.lineTo(this.canvas.width - paddingRight, y);
             this.ctx.stroke();
             
             // Left axis label (score)
-            this.ctx.fillStyle = `rgba(255, 255, 255, ${0.2 * opacityMultiplier})`;
+            this.ctx.fillStyle = `rgba(${axisColor}, ${0.2 * opacityMultiplier})`;
             this.ctx.fillText(score, padding - 35, y + 4);
             
             // Right axis label (undos)
             const undoValue = Math.round(maxUndos * (1 - i / 5));
-            this.ctx.fillStyle = `rgba(255, 107, 0, ${0.2 * opacityMultiplier})`;
+            const undoColor = isBrightMode ? '143, 122, 102' : '255, 107, 0';
+            this.ctx.fillStyle = `rgba(${undoColor}, ${0.2 * opacityMultiplier})`;
             this.ctx.fillText(undoValue, this.canvas.width - paddingRight + 5, y + 4);
         }
         
@@ -148,7 +151,8 @@ class Analytics {
         
         // Draw moving average line
         if (movingAverage.length > 1) {
-            this.ctx.strokeStyle = `rgba(255, 107, 0, ${0.3 * opacityMultiplier})`;
+            const lineColor = isBrightMode ? '143, 122, 102' : '255, 107, 0';
+            this.ctx.strokeStyle = `rgba(${lineColor}, ${0.3 * opacityMultiplier})`;
             this.ctx.lineWidth = 2;
             this.ctx.beginPath();
             
@@ -168,7 +172,7 @@ class Analytics {
         
         // Draw undo line
         if (this.games.length > 1) {
-            this.ctx.strokeStyle = `rgba(255, 107, 0, ${0.2 * opacityMultiplier})`;
+            this.ctx.strokeStyle = `rgba(${undoColor}, ${0.2 * opacityMultiplier})`;
             this.ctx.lineWidth = 1;
             this.ctx.setLineDash([5, 5]);
             this.ctx.beginPath();
@@ -195,7 +199,8 @@ class Analytics {
             const y = padding + (1 - game.score / maxScore) * chartHeight;
             
             // Draw score point
-            this.ctx.fillStyle = `rgba(255, 107, 0, ${(0.3 + 0.7 * (index / this.games.length)) * opacityMultiplier})`;
+            const pointColor = isBrightMode ? '143, 122, 102' : '255, 107, 0';
+            this.ctx.fillStyle = `rgba(${pointColor}, ${(0.3 + 0.7 * (index / this.games.length)) * opacityMultiplier})`;
             this.ctx.beginPath();
             this.ctx.arc(x, y, 4, 0, Math.PI * 2);
             this.ctx.fill();
@@ -203,10 +208,11 @@ class Analytics {
         
         // Draw legend
         this.ctx.font = '10px -apple-system, BlinkMacSystemFont, sans-serif';
-        this.ctx.fillStyle = `rgba(255, 255, 255, ${0.2 * opacityMultiplier})`;
+        this.ctx.fillStyle = `rgba(${axisColor}, ${0.2 * opacityMultiplier})`;
         this.ctx.fillText('● Individual games', this.canvas.width - 130, 20);
         this.ctx.fillText('(size = undos)', this.canvas.width - 130, 32);
-        this.ctx.fillStyle = `rgba(255, 107, 0, ${0.3 * opacityMultiplier})`;
+        const avgColor = isBrightMode ? '143, 122, 102' : '255, 107, 0';
+        this.ctx.fillStyle = `rgba(${avgColor}, ${0.3 * opacityMultiplier})`;
         this.ctx.fillText('— 7-day average', this.canvas.width - 130, 47);
     }
     

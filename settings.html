@@ -148,6 +148,64 @@
             opacity: 1;
             color: rgba(255, 255, 255, 0.8);
         }
+        
+        /* Bright mode styles */
+        body.bright-mode {
+            background: #faf8f5;
+            color: #776e65;
+        }
+        
+        body.bright-mode .back-button {
+            color: #776e65;
+        }
+        
+        body.bright-mode .back-button:hover {
+            color: #8f7a66;
+        }
+        
+        body.bright-mode .settings-section {
+            background: rgba(187, 173, 160, 0.1);
+        }
+        
+        body.bright-mode h1, body.bright-mode h2 {
+            color: #776e65;
+        }
+        
+        body.bright-mode .slider-label {
+            color: #776e65;
+        }
+        
+        body.bright-mode .slider-value {
+            color: #8f7a66;
+        }
+        
+        body.bright-mode input[type="range"] {
+            background: rgba(187, 173, 160, 0.3);
+        }
+        
+        body.bright-mode input[type="range"]::-webkit-slider-thumb {
+            background: #8f7a66;
+        }
+        
+        body.bright-mode input[type="range"]::-moz-range-thumb {
+            background: #8f7a66;
+        }
+        
+        body.bright-mode .stat {
+            color: #776e65;
+        }
+        
+        body.bright-mode .stat-value {
+            color: #8f7a66;
+        }
+        
+        body.bright-mode .stat-label {
+            color: #776e65;
+        }
+        
+        body.bright-mode .no-data {
+            color: #776e65;
+        }
     </style>
 </head>
 <body>
@@ -206,8 +264,8 @@
     
     <script>
         // Apply dark mode setting from main game
-        const darkMode = localStorage.getItem('2048-darkmode') || '0';
-        document.body.className = `dark-level-${darkMode}`;
+        const darkMode = parseInt(localStorage.getItem('2048-darkmode') || '0');
+        document.body.className = darkMode === 3 ? 'bright-mode' : `dark-level-${darkMode}`;
         
         // Handle multiplier slider
         const slider = document.getElementById('multiplier-slider');

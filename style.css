@@ -33,6 +33,11 @@ body.dark-level-2 {
     background: #000;
 }
 
+body.bright-mode {
+    background: #faf8f5;
+    color: #776e65;
+}
+
 body.dark-level-2 .container {
     opacity: 0.2;
 }
@@ -277,6 +282,92 @@ button:focus {
     display: none;
 }
 
+/* Bright mode styles */
+body.bright-mode .score-container {
+    color: #776e65;
+    opacity: 1;
+}
+
+body.bright-mode button {
+    color: #776e65;
+    background: rgba(119, 110, 101, 0.1);
+}
+
+body.bright-mode button:hover {
+    color: #776e65;
+    background: rgba(119, 110, 101, 0.2);
+}
+
+body.bright-mode .game-grid {
+    background: #bbada0;
+    padding: 10px;
+    border-radius: 6px;
+}
+
+body.bright-mode .grid-cell {
+    background: rgba(238, 228, 218, 0.35);
+}
+
+body.bright-mode .tile-2 {
+    background: #eee4da;
+    color: #776e65;
+}
+
+body.bright-mode .tile-4 {
+    background: #ede0c8;
+    color: #776e65;
+}
+
+body.bright-mode .tile-8 {
+    background: #f2b179;
+    color: #f9f6f2;
+}
+
+body.bright-mode .tile-16 {
+    background: #f59563;
+    color: #f9f6f2;
+}
+
+body.bright-mode .tile-32 {
+    background: #f67c5f;
+    color: #f9f6f2;
+}
+
+body.bright-mode .tile-64 {
+    background: #f65e3b;
+    color: #f9f6f2;
+}
+
+body.bright-mode .tile-128 {
+    background: #edcf72;
+    color: #f9f6f2;
+    font-size: var(--font-size-small, 28px);
+}
+
+body.bright-mode .tile-256 {
+    background: #edcc61;
+    color: #f9f6f2;
+    font-size: var(--font-size-small, 28px);
+}
+
+body.bright-mode .tile-512 {
+    background: #edc850;
+    color: #f9f6f2;
+    font-size: var(--font-size-small, 28px);
+}
+
+body.bright-mode .tile-1024 {
+    background: #edc53f;
+    color: #f9f6f2;
+    font-size: var(--font-size-tiny, 24px);
+}
+
+body.bright-mode .tile-2048 {
+    background: #edc22e;
+    color: #f9f6f2;
+    font-size: var(--font-size-tiny, 24px);
+}
+
 /* Game over overlay */
 .game-over-overlay {
     position: absolute;
@@ -329,5 +420,29 @@ button:focus {
     background: rgba(255, 107, 0, 0.3);
     border-color: rgba(255, 107, 0, 0.6);
     color: rgba(255, 255, 255, 0.9);
+}
+
+/* Bright mode game over styles */
+body.bright-mode .game-over-overlay {
+    background: rgba(255, 255, 255, 0.9);
+}
+
+body.bright-mode .game-over-message h2 {
+    color: #776e65;
+}
+
+body.bright-mode .game-over-message .final-score {
+    color: #776e65;
+}
+
+body.bright-mode .new-game-overlay {
+    background: #8f7a66;
+    border: none;
+    color: #f9f6f2;
+}
+
+body.bright-mode .new-game-overlay:hover {
+    background: #9f8a76;
+    color: #f9f6f2;
 }
 
