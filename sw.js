@@ -1,9 +1,11 @@
-const CACHE_NAME = '2048-dark-v1';
+const CACHE_NAME = '2048-dark-v3';
 const urlsToCache = [
   '/',
   '/index.html',
   '/style.css',
-  '/game.js'
+  '/game.js',
+  '/analytics.html',
+  '/analytics.js'
 ];
 
 // Install service worker and cache resources
@@ -45,6 +47,11 @@ self.addEventListener('fetch', event => {
   // Skip requests from extensions and dev server
   const url = new URL(event.request.url);
   if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+  
+  // Skip ALL localhost requests to avoid interfering with development
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1') {
+    return;
+  }
   
   // Skip Vite HMR and dev server requests
   if (url.pathname.includes('/@vite') || 

@@ -19,6 +19,7 @@ class Game2048 {
         this.continuousDrag = false;
         this.waitingForNewDirection = false;
         this.highScore = this.loadHighScore();
+        this.undoCount = 0;
         this.init();
     }
 
@@ -52,6 +53,10 @@ class Game2048 {
 
         document.querySelector('.undo').addEventListener('click', () => {
             this.undo();
+        });
+        
+        document.querySelector('.analytics').addEventListener('click', () => {
+            window.location.href = 'analytics.html';
         });
 
         // Touch event handling with real-time preview on whole screen
@@ -504,12 +509,18 @@ class Game2048 {
     }
 
     startNewGame() {
+        // Save the previous game if it had a score
+        if (this.score > 0) {
+            this.saveCompletedGame();
+        }
+        
         this.grid = Array(this.size).fill().map(() => Array(this.size).fill(0));
         this.score = 0;
         this.tiles.forEach(tile => tile.element.remove());
         this.tiles.clear();
         this.tileId = 0;
         this.history = [];
+        this.undoCount = 0;
         this.updateScore();
         this.addNewTile();
         this.addNewTile();
@@ -941,6 +952,22 @@ class Game2048 {
     saveHighScore() {
         localStorage.setItem('2048-highscore', this.highScore.toString());
     }
+    
+    saveCompletedGame() {
+        const games = this.loadGameHistory();
+        games.push({
+            score: this.score,
+            timestamp: new Date().toISOString(),
+            moves: this.history.length,
+            undos: this.undoCount
+        });
+        localStorage.setItem('2048-games', JSON.stringify(games));
+    }
+    
+    loadGameHistory() {
+        const saved = localStorage.getItem('2048-games');
+        return saved ? JSON.parse(saved) : [];
+    }
 
 
     saveState() {
@@ -966,6 +993,7 @@ class Game2048 {
     undo() {
         if (this.history.length === 0) return;
         
+        this.undoCount++;
         const state = this.history.pop();
         this.grid = state.grid;
         this.score = state.score;

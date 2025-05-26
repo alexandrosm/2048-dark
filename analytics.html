@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2048 Analytics</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .analytics-container {
+            text-align: center;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 10px;
+            transition: all 0.2s ease;
+        }
+        
+        .back-button:hover {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 40px 0;
+        }
+        
+        #chart {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            margin: 10px;
+            opacity: 0.3;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 100;
+            color: #ff6b00;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.7;
+        }
+        
+        h1 {
+            font-weight: 100;
+            opacity: 0.3;
+            margin: 20px 0;
+        }
+        
+        .no-data {
+            opacity: 0.3;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.location.href='index.html'">←</button>
+    
+    <div class="analytics-container">
+        <h1>Performance Analytics</h1>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="total-games">0</div>
+                <div class="stat-label">Games Played</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="avg-score">0</div>
+                <div class="stat-label">Average Score</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="best-score">0</div>
+                <div class="stat-label">Best Score</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="trend">-</div>
+                <div class="stat-label">7-Day Trend</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="avg-undos">0</div>
+                <div class="stat-label">Avg Undos</div>
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="chart"></canvas>
+        </div>
+        
+        <div class="no-data" id="no-data" style="display: none;">
+            No games recorded yet. Play some games to see your analytics!
+        </div>
+    </div>
+    
+    <script src="analytics.js"></script>
+</body>
+</html>
