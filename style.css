@@ -84,6 +84,8 @@ body.dark-level-2 .dark-toggle {
 .score {
     display: inline-block;
     padding: 5px 15px;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 200;
 }
 
 .game-container {
@@ -293,6 +295,11 @@ button:focus {
 body.bright-mode .score-container {
     color: #776e65;
     opacity: 1;
+}
+
+body.bright-mode .score {
+    color: #776e65;
+    font-weight: 400;
 }
 
 body.bright-mode button {
