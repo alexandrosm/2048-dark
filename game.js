@@ -1372,6 +1372,9 @@ class Game2048 {
         });
         
         this.updateScore();
+        
+        // Hide game over overlay if it's showing
+        this.hideGameOver();
     }
 }
 
