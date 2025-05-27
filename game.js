@@ -338,8 +338,8 @@ class Game2048 {
             if (direction && !this.waitingForNewDirection) {
                 const moveRatio = this.previewMove(direction, distance);
                 
-                // If tiles have reached their destination (moveRatio >= 1), execute the move
-                if (moveRatio >= 1 && direction !== this.lastExecutedDirection) {
+                // If tiles have moved 90% of the way (moveRatio >= 0.9), execute the move
+                if (moveRatio >= 0.9 && direction !== this.lastExecutedDirection) {
                     this.executeMove(direction, currentX, currentY);
                     this.continuousDrag = true;
                 }
@@ -451,8 +451,8 @@ class Game2048 {
             if (direction && !this.waitingForNewDirection) {
                 const moveRatio = this.previewMove(direction, distance);
                 
-                // If tiles have reached their destination (moveRatio >= 1), execute the move
-                if (moveRatio >= 1 && direction !== this.lastExecutedDirection) {
+                // If tiles have moved 90% of the way (moveRatio >= 0.9), execute the move
+                if (moveRatio >= 0.9 && direction !== this.lastExecutedDirection) {
                     this.executeMove(direction, currentX, currentY);
                     this.continuousDrag = true;
                 }
