@@ -48,4 +48,6 @@ Install the "Live Server" extension and right-click on `index.html`
 
 ## Deployment
 
-The game is deployed to GitHub Pages at: https://alexandrosm.github.io/2048-dark/
+The game is deployed at: https://dark2048.com
+
+Also available at: https://alexandrosm.github.io/2048-dark/
