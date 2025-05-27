@@ -1,0 +1,12 @@
+{
+  "name": "2048-dark",
+  "version": "1.0.0",
+  "description": "Minimalist 2048 game with dark theme",
+  "scripts": {
+    "dev": "npx http-server -p 8080 -c-1",
+    "serve": "python3 -m http.server 8080"
+  },
+  "keywords": ["2048", "game", "pwa"],
+  "author": "",
+  "license": "MIT"
+}
