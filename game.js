@@ -1174,8 +1174,12 @@ class Game2048 {
         // Calculate percentage of high score
         const percentage = this.highScore > 0 ? Math.round((this.score / this.highScore) * 100) : 0;
         
-        // Display score / percentage format
-        document.querySelector('.score').textContent = `${this.score} / ${percentage}%`;
+        // Display score / percentage format (omit percentage when at 100%)
+        if (percentage === 100) {
+            document.querySelector('.score').textContent = `${this.score}`;
+        } else {
+            document.querySelector('.score').textContent = `${this.score} / ${percentage}%`;
+        }
     }
 
     toggleDarkMode() {

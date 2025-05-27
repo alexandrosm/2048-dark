@@ -1,4 +1,4 @@
-const CACHE_NAME = '2048-dark-v24';
+const CACHE_NAME = '2048-dark-v25';
 const urlsToCache = [
   '/',
   '/index.html',
