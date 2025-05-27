@@ -20,6 +20,7 @@ class Game2048 {
         this.waitingForNewDirection = false;
         this.highScore = this.loadHighScore();
         this.undoCount = 0;
+        this.lastMoveTime = 0;
         this.cellSize = 70; // Default value
         this.gapSize = 12; // Default value
         this.init();
@@ -295,7 +296,7 @@ class Game2048 {
             // Check if we're waiting for direction change
             if (this.waitingForNewDirection) {
                 // Calculate movement from last executed position
-                const moveThreshold = parseInt(localStorage.getItem('2048-move-threshold') || '15'); // Pixels needed to register as new direction
+                const moveThreshold = 30; // Pixels needed to register as new direction
                 const actualMovement = Math.sqrt(
                     Math.pow(currentX - this.dragStartX, 2) + 
                     Math.pow(currentY - this.dragStartY, 2)
@@ -409,7 +410,7 @@ class Game2048 {
             // Check if we're waiting for direction change
             if (this.waitingForNewDirection) {
                 // Calculate movement from last executed position
-                const moveThreshold = parseInt(localStorage.getItem('2048-move-threshold') || '15'); // Pixels needed to register as new direction
+                const moveThreshold = 30; // Pixels needed to register as new direction
                 const actualMovement = Math.sqrt(
                     Math.pow(currentX - this.dragStartX, 2) + 
                     Math.pow(currentY - this.dragStartY, 2)
@@ -787,6 +788,17 @@ class Game2048 {
     move(direction) {
         // Prevent multiple simultaneous moves
         if (this.moveInProgress) return;
+        
+        // Check move cooldown
+        const cooldown = parseInt(localStorage.getItem('2048-move-cooldown') || '50');
+        if (cooldown > 0) {
+            const now = Date.now();
+            const timeSinceLastMove = now - this.lastMoveTime;
+            if (timeSinceLastMove < cooldown) {
+                return; // Too soon to make another move
+            }
+            this.lastMoveTime = now;
+        }
         
         this.moveInProgress = true;
         const previousGrid = JSON.stringify(this.grid);

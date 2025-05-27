@@ -276,11 +276,11 @@
             </div>
             
             <div class="slider-container" style="margin-top: 30px;">
-                <div class="slider-label">Direction Change Threshold</div>
-                <div class="slider-value" id="threshold-value">15px</div>
-                <input type="range" id="threshold-slider" min="5" max="50" step="5" value="15">
+                <div class="slider-label">Move Cooldown</div>
+                <div class="slider-value" id="cooldown-value">50ms</div>
+                <input type="range" id="cooldown-slider" min="0" max="300" step="25" value="50">
                 <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
-                    Pixels needed to allow repeated moves in same direction
+                    Minimum time between repeated moves (0 = no limit)
                 </div>
             </div>
         </div>
@@ -363,20 +363,20 @@
             localStorage.setItem('2048-multiplier', value);
         });
         
-        // Handle threshold slider
-        const thresholdSlider = document.getElementById('threshold-slider');
-        const thresholdDisplay = document.getElementById('threshold-value');
+        // Handle cooldown slider
+        const cooldownSlider = document.getElementById('cooldown-slider');
+        const cooldownDisplay = document.getElementById('cooldown-value');
         
-        // Load saved threshold
-        const savedThreshold = localStorage.getItem('2048-move-threshold') || '15';
-        thresholdSlider.value = savedThreshold;
-        thresholdDisplay.textContent = `${savedThreshold}px`;
+        // Load saved cooldown
+        const savedCooldown = localStorage.getItem('2048-move-cooldown') || '50';
+        cooldownSlider.value = savedCooldown;
+        cooldownDisplay.textContent = `${savedCooldown}ms`;
         
         // Update on change
-        thresholdSlider.addEventListener('input', (e) => {
+        cooldownSlider.addEventListener('input', (e) => {
             const value = e.target.value;
-            thresholdDisplay.textContent = `${value}px`;
-            localStorage.setItem('2048-move-threshold', value);
+            cooldownDisplay.textContent = `${value}ms`;
+            localStorage.setItem('2048-move-cooldown', value);
         });
         
         // Handle gameplay options
