@@ -220,6 +220,42 @@
         body.bright-mode .no-data {
             color: #776e65;
         }
+        
+        /* Checkbox styles */
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 4px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="checkbox"]:checked {
+            background: rgba(255, 107, 0, 0.8);
+            border-color: rgba(255, 107, 0, 0.8);
+        }
+        
+        input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+        }
+        
+        body.bright-mode input[type="checkbox"] {
+            background: rgba(187, 173, 160, 0.3);
+            border-color: #8f7a66;
+        }
+        
+        body.bright-mode input[type="checkbox"]:checked {
+            background: #8f7a66;
+            border-color: #8f7a66;
+        }
     </style>
 </head>
 <body>
@@ -236,6 +272,27 @@
                 <input type="range" id="multiplier-slider" min="1" max="6" step="0.1" value="3.5">
                 <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
                     Higher values = more sensitive swipes
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <h2>Gameplay Options</h2>
+            <div style="margin: 20px auto; max-width: 400px;">
+                <label style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0; cursor: pointer;">
+                    <span style="color: rgba(255, 255, 255, 0.8); font-size: 16px;">Start with 1 tiles</span>
+                    <input type="checkbox" id="start-with-ones" style="width: 20px; height: 20px; cursor: pointer;">
+                </label>
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-bottom: 20px;">
+                    New tiles spawn as 1 instead of 2
+                </div>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0; cursor: pointer;">
+                    <span style="color: rgba(255, 255, 255, 0.8); font-size: 16px;">Lucky 8s (1% chance)</span>
+                    <input type="checkbox" id="lucky-eights" style="width: 20px; height: 20px; cursor: pointer;">
+                </label>
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
+                    1% chance to spawn an 8 tile
                 </div>
             </div>
         </div>
@@ -295,6 +352,23 @@
             const value = e.target.value;
             valueDisplay.textContent = `${value}x`;
             localStorage.setItem('2048-multiplier', value);
+        });
+        
+        // Handle gameplay options
+        const startWithOnes = document.getElementById('start-with-ones');
+        const luckyEights = document.getElementById('lucky-eights');
+        
+        // Load saved settings
+        startWithOnes.checked = localStorage.getItem('2048-start-with-ones') === 'true';
+        luckyEights.checked = localStorage.getItem('2048-lucky-eights') === 'true';
+        
+        // Save on change
+        startWithOnes.addEventListener('change', (e) => {
+            localStorage.setItem('2048-start-with-ones', e.target.checked);
+        });
+        
+        luckyEights.addEventListener('change', (e) => {
+            localStorage.setItem('2048-lucky-eights', e.target.checked);
         });
     </script>
     <script src="settings.js"></script>

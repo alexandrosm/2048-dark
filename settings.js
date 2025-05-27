@@ -252,4 +252,21 @@ class Analytics {
 // Initialize analytics when page loads
 document.addEventListener('DOMContentLoaded', () => {
     new Analytics();
+    
+    // Initialize gameplay option checkboxes
+    const startWithOnesCheckbox = document.getElementById('start-with-ones');
+    const luckyEightsCheckbox = document.getElementById('lucky-eights');
+    
+    // Load saved states
+    startWithOnesCheckbox.checked = localStorage.getItem('2048-start-with-ones') === 'true';
+    luckyEightsCheckbox.checked = localStorage.getItem('2048-lucky-eights') === 'true';
+    
+    // Save on change
+    startWithOnesCheckbox.addEventListener('change', () => {
+        localStorage.setItem('2048-start-with-ones', startWithOnesCheckbox.checked);
+    });
+    
+    luckyEightsCheckbox.addEventListener('change', () => {
+        localStorage.setItem('2048-lucky-eights', luckyEightsCheckbox.checked);
+    });
 });

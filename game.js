@@ -742,7 +742,25 @@ class Game2048 {
 
         if (emptyCells.length > 0) {
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
-            const value = Math.random() < 0.9 ? 2 : 4;
+            
+            // Check settings
+            const startWithOnes = localStorage.getItem('2048-start-with-ones') === 'true';
+            const luckyEights = localStorage.getItem('2048-lucky-eights') === 'true';
+            
+            let value;
+            const rand = Math.random();
+            
+            // 1% chance for 8 if lucky eights is enabled
+            if (luckyEights && rand < 0.01) {
+                value = 8;
+            } else if (rand < 0.9) {
+                // 90% chance for base value (1 or 2)
+                value = startWithOnes ? 1 : 2;
+            } else {
+                // 10% (or 9% with lucky eights) chance for double value
+                value = startWithOnes ? 2 : 4;
+            }
+            
             this.grid[randomCell.row][randomCell.col] = value;
             
             const tileElement = this.createTileElement(value, randomCell.row, randomCell.col);

@@ -120,6 +120,11 @@ body.dark-level-2 .dark-toggle {
     transition: all 0.15s ease;
 }
 
+.tile-1 {
+    color: rgba(255, 255, 255, 0.3);
+    animation: appear 0.3s ease;
+}
+
 .tile-2 {
     color: rgba(255, 255, 255, 0.4);
     animation: appear 0.3s ease;
@@ -217,6 +222,7 @@ body.dark-level-2 .dark-toggle {
 }
 
 
+body.dark-level-1 .tile-1 { color: rgba(255, 255, 255, 0.15); }
 body.dark-level-1 .tile-2 { color: rgba(255, 255, 255, 0.2); }
 body.dark-level-1 .tile-4 { color: rgba(255, 255, 200, 0.25); }
 body.dark-level-1 .tile-8 { color: rgba(255, 200, 150, 0.3); }
@@ -229,6 +235,7 @@ body.dark-level-1 .tile-512 { color: rgba(255, 80, 40, 0.6); }
 body.dark-level-1 .tile-1024 { color: rgba(255, 60, 30, 0.65); }
 body.dark-level-1 .tile-2048 { color: rgba(255, 40, 20, 0.7); }
 
+body.dark-level-2 .tile-1 { color: rgba(255, 255, 255, 0.06); }
 body.dark-level-2 .tile-2 { color: rgba(255, 255, 255, 0.08); }
 body.dark-level-2 .tile-4 { color: rgba(255, 255, 200, 0.1); }
 body.dark-level-2 .tile-8 { color: rgba(255, 200, 150, 0.12); }
@@ -306,6 +313,11 @@ body.bright-mode .game-grid {
 
 body.bright-mode .grid-cell {
     background: rgba(238, 228, 218, 0.35);
+}
+
+body.bright-mode .tile-1 {
+    background: #f3f0eb;
+    color: #776e65;
 }
 
 body.bright-mode .tile-2 {
