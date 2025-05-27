@@ -792,6 +792,9 @@ class Game2048 {
         const previousGrid = JSON.stringify(this.grid);
         const movements = [];
         
+        // Clear any preview positions since we're doing an actual move
+        this.previewPositions.clear();
+        
         // Save state before move
         this.saveState();
         
@@ -829,9 +832,8 @@ class Game2048 {
                 }
             }, 150);
         } else {
-            // No valid move - reset tiles to original positions
+            // No valid move - just remove from history
             this.history.pop();
-            this.resetToInitialPositions();
             this.moveInProgress = false;
         }
     }
