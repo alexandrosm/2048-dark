@@ -2,11 +2,17 @@
   "name": "2048-dark",
   "version": "1.0.0",
   "description": "Minimalist 2048 game with dark theme",
+  "type": "module",
   "scripts": {
-    "dev": "npx http-server -p 8080 -c-1",
-    "serve": "python3 -m http.server 8080"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "serve": "npx http-server -p 8080 -c-1"
   },
   "keywords": ["2048", "game", "pwa"],
   "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
 }

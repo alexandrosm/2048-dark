@@ -4,30 +4,37 @@ A minimalist 2048 game with dark theme and PWA support.
 
 ## Development
 
-To run a local development server, you have several options:
-
-### Option 1: Using npm (no install needed)
+### Quick Start (with Vite - Recommended)
 ```bash
+# Install dependencies
+npm install
+
+# Run development server with hot reload
 npm run dev
 ```
-This uses npx to run http-server without installing dependencies.
 
-### Option 2: Using Python (if you have Python 3)
+The game will be available at http://localhost:5173 with hot module reload enabled.
+
+**Note for WSL users**: The Vite config includes special settings for WSL2 compatibility (polling-based file watching).
+
+### Alternative Options
+
+#### Simple HTTP Server (no hot reload)
 ```bash
 npm run serve
-# or directly:
-python3 -m http.server 8080
 ```
 
-### Option 3: Using Python 2
+#### Using Python
 ```bash
+# Python 3
+python3 -m http.server 8080
+
+# Python 2
 python -m SimpleHTTPServer 8080
 ```
 
-### Option 4: Using VS Code Live Server
-If you're using VS Code, install the "Live Server" extension and right-click on `index.html` to select "Open with Live Server".
-
-The game will be available at http://localhost:8080
+#### VS Code Live Server
+Install the "Live Server" extension and right-click on `index.html`
 
 ## Features
 
