@@ -1,6 +1,22 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
-.vite/
-sentry-console-logs.json
-console-commands.json
+build/
+
+# Development files
 *.log
+.DS_Store
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+Thumbs.db
+desktop.ini

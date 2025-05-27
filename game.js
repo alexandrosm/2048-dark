@@ -13,7 +13,6 @@ class Game2048 {
         this.dragMultiplier = parseFloat(localStorage.getItem('2048-multiplier') || '3.5');
         this.previewPositions = new Map();
         this.history = [];
-        this.autoReloadInterval = null;
         this.lastExecutedDirection = null;
         this.moveInProgress = false;
         this.continuousDrag = false;
@@ -131,7 +130,7 @@ class Game2048 {
                     this.updateBatteryBackground(battery.level);
                 });
             }).catch(err => {
-                console.log('Battery API not available:', err);
+                // Battery API not available
             });
         }
     }
@@ -1305,7 +1304,7 @@ class Game2048 {
             this.updateScore();
             return true;
         } catch (e) {
-            console.error('Failed to load game state:', e);
+            // Failed to load game state
             return false;
         }
     }
@@ -1383,10 +1382,10 @@ if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
             .then(registration => {
-                console.log('ServiceWorker registration successful');
+                // ServiceWorker registration successful
             })
             .catch(err => {
-                console.log('ServiceWorker registration failed: ', err);
+                // ServiceWorker registration failed
             });
     });
 }
