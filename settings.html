@@ -317,8 +317,8 @@
                     <label style="color: rgba(255, 255, 255, 0.8); font-size: 16px; display: block; margin-bottom: 10px;">Undo Levels</label>
                     <select id="undo-levels" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); border-radius: 5px; font-size: 16px;">
                         <option value="0" style="background: #000;">None - No undos allowed</option>
-                        <option value="1" style="background: #000;">Single - One undo only</option>
-                        <option value="-1" style="background: #000;" selected>Unlimited - Undo anytime</option>
+                        <option value="1" style="background: #000;" selected>Single - One undo only</option>
+                        <option value="-1" style="background: #000;">Unlimited - Undo anytime</option>
                     </select>
                     <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-top: 8px;">
                         Control how many times you can undo moves
@@ -424,7 +424,7 @@
         // Load saved settings
         startWithOnes.checked = localStorage.getItem('2048-start-with-ones') === 'true';
         luckyEights.checked = localStorage.getItem('2048-lucky-eights') === 'true';
-        undoLevels.value = localStorage.getItem('2048-undo-levels') || '-1';
+        undoLevels.value = localStorage.getItem('2048-undo-levels') || '1';
         
         // Save on change
         startWithOnes.addEventListener('change', (e) => {

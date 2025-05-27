@@ -1361,7 +1361,7 @@ class Game2048 {
         if (this.history.length === 0) return;
         
         // Check undo level setting
-        const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '-1');
+        const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '1');
         
         // If no undos allowed
         if (undoLevel === 0) return;
@@ -1405,7 +1405,7 @@ class Game2048 {
         const undoButton = document.querySelector('button[onclick="game.undo()"]');
         if (!undoButton) return;
         
-        const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '-1');
+        const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '1');
         let isDisabled = false;
         
         // Check if undo should be disabled
