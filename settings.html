@@ -283,6 +283,15 @@
                     Minimum time between repeated moves (0 = no limit)
                 </div>
             </div>
+            
+            <div class="slider-container" style="margin-top: 30px;">
+                <div class="slider-label">Animation Speed</div>
+                <div class="slider-value" id="animation-value">150ms</div>
+                <input type="range" id="animation-slider" min="50" max="300" step="25" value="150">
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
+                    Tile movement animation duration
+                </div>
+            </div>
         </div>
         
         <div class="settings-section">
@@ -377,6 +386,22 @@
             const value = e.target.value;
             cooldownDisplay.textContent = `${value}ms`;
             localStorage.setItem('2048-move-cooldown', value);
+        });
+        
+        // Handle animation speed slider
+        const animationSlider = document.getElementById('animation-slider');
+        const animationDisplay = document.getElementById('animation-value');
+        
+        // Load saved animation speed
+        const savedAnimation = localStorage.getItem('2048-animation-speed') || '150';
+        animationSlider.value = savedAnimation;
+        animationDisplay.textContent = `${savedAnimation}ms`;
+        
+        // Update on change
+        animationSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            animationDisplay.textContent = `${value}ms`;
+            localStorage.setItem('2048-animation-speed', value);
         });
         
         // Handle gameplay options

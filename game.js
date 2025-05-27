@@ -523,12 +523,13 @@ class Game2048 {
         
         // After move completes, reset for next potential move
         if (this.isDragging && currentX !== undefined && currentY !== undefined) {
+            const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
             setTimeout(() => {
                 // Update drag start position for continuous dragging
                 this.dragStartX = currentX;
                 this.dragStartY = currentY;
                 this.saveInitialPositions();
-            }, 150); // Wait for move animation to complete
+            }, animationSpeed); // Wait for move animation to complete
         }
     }
 
@@ -831,6 +832,7 @@ class Game2048 {
         if (JSON.stringify(this.grid) !== previousGrid) {
             this.animateMovements(movements);
             
+            const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
             setTimeout(() => {
                 this.cleanupMergedTiles();
                 this.addNewTile();
@@ -842,7 +844,7 @@ class Game2048 {
                         this.showGameOver();
                     }, 300);
                 }
-            }, 150);
+            }, animationSpeed);
         } else {
             // No valid move - just remove from history
             this.history.pop();
@@ -851,6 +853,9 @@ class Game2048 {
     }
 
     animateMovements(movements) {
+        const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
+        const animationSeconds = animationSpeed / 1000;
+        
         movements.forEach(({tile, newRow, newCol, merged, mergedWith}) => {
             tile.row = newRow;
             tile.col = newCol;
@@ -863,7 +868,7 @@ class Game2048 {
             
             // Only animate if there's actual movement needed
             if (Math.abs(currentLeft - targetLeft) > 0.1 || Math.abs(currentTop - targetTop) > 0.1) {
-                tile.element.style.transition = 'left 0.15s ease, top 0.15s ease';
+                tile.element.style.transition = `left ${animationSeconds}s ease, top ${animationSeconds}s ease`;
             } else {
                 tile.element.style.transition = 'none';
             }
@@ -878,7 +883,7 @@ class Game2048 {
                     tile.element.className = `tile tile-${tile.value}`;
                     mergedWith.element.remove();
                     this.tiles.delete(mergedWith.id);
-                }, 150);
+                }, animationSpeed);
             }
         });
     }
