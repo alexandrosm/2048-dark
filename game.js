@@ -32,6 +32,7 @@ class Game2048 {
         this.setupResponsiveSizing();
         this.setupGrid();
         this.setupEventListeners();
+        this.setupBatteryMonitoring();
         
         // Check if launched from shortcut to start new game
         const urlParams = new URLSearchParams(window.location.search);
@@ -110,6 +111,61 @@ class Game2048 {
             const cell = document.createElement('div');
             cell.classList.add('grid-cell');
             gameGrid.appendChild(cell);
+        }
+    }
+    
+    setupBatteryMonitoring() {
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(battery => {
+                // Initial battery check
+                this.updateBatteryBackground(battery.level);
+                
+                // Monitor battery level changes
+                battery.addEventListener('levelchange', () => {
+                    this.updateBatteryBackground(battery.level);
+                });
+                
+                // Also update when charging status changes
+                battery.addEventListener('chargingchange', () => {
+                    this.updateBatteryBackground(battery.level);
+                });
+            }).catch(err => {
+                console.log('Battery API not available:', err);
+            });
+        }
+    }
+    
+    updateBatteryBackground(level) {
+        // Only apply red background if battery is below 10% (0.1)
+        if (level <= 0.1) {
+            // Calculate red intensity: 0% at 10% battery, 100% at 1% battery
+            const redIntensity = 1 - (level / 0.1);
+            
+            // Create a red overlay div if it doesn't exist
+            let batteryOverlay = document.getElementById('battery-warning-overlay');
+            if (!batteryOverlay) {
+                batteryOverlay = document.createElement('div');
+                batteryOverlay.id = 'battery-warning-overlay';
+                batteryOverlay.style.position = 'fixed';
+                batteryOverlay.style.top = '0';
+                batteryOverlay.style.left = '0';
+                batteryOverlay.style.width = '100%';
+                batteryOverlay.style.height = '100%';
+                batteryOverlay.style.pointerEvents = 'none';
+                batteryOverlay.style.zIndex = '9999';
+                batteryOverlay.style.transition = 'background-color 0.5s ease';
+                document.body.appendChild(batteryOverlay);
+            }
+            
+            // Set the red background with appropriate opacity
+            const opacity = redIntensity * 0.5; // Max 50% opacity to keep game visible
+            batteryOverlay.style.backgroundColor = `rgba(255, 0, 0, ${opacity})`;
+        } else {
+            // Remove the overlay if battery is above 10%
+            const batteryOverlay = document.getElementById('battery-warning-overlay');
+            if (batteryOverlay) {
+                batteryOverlay.remove();
+            }
         }
     }
 
