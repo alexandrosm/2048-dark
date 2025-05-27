@@ -744,7 +744,17 @@ class Game2048 {
         for (let row = 0; row < this.size; row++) {
             for (let col = 0; col < this.size; col++) {
                 if (this.grid[row][col] === 0) {
-                    emptyCells.push({row, col});
+                    // Check if any tile is still occupying this position (including tiles marked for removal)
+                    let occupied = false;
+                    this.tiles.forEach(tile => {
+                        if (tile.row === row && tile.col === col && !tile.toBeRemoved) {
+                            occupied = true;
+                        }
+                    });
+                    
+                    if (!occupied) {
+                        emptyCells.push({row, col});
+                    }
                 }
             }
         }
@@ -842,15 +852,19 @@ class Game2048 {
             const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
             setTimeout(() => {
                 this.cleanupMergedTiles();
-                this.addNewTile();
-                this.saveGameState();
-                this.moveInProgress = false;
                 
-                if (this.isGameOver()) {
-                    setTimeout(() => {
-                        this.showGameOver();
-                    }, 300);
-                }
+                // Add a small delay to ensure all tiles have settled
+                setTimeout(() => {
+                    this.addNewTile();
+                    this.saveGameState();
+                    this.moveInProgress = false;
+                    
+                    if (this.isGameOver()) {
+                        setTimeout(() => {
+                            this.showGameOver();
+                        }, 300);
+                    }
+                }, 50);
             }, animationSpeed);
         } else {
             // No valid move - just remove from history
@@ -884,6 +898,9 @@ class Game2048 {
             tile.element.style.top = `${targetTop}px`;
             
             if (merged && mergedWith) {
+                // Mark the merged tile for removal immediately
+                mergedWith.toBeRemoved = true;
+                
                 setTimeout(() => {
                     tile.value *= 2;
                     tile.element.textContent = tile.value;
