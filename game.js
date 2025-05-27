@@ -295,7 +295,7 @@ class Game2048 {
             // Check if we're waiting for direction change
             if (this.waitingForNewDirection) {
                 // Calculate movement from last executed position
-                const moveThreshold = 30; // Pixels needed to register as new direction
+                const moveThreshold = parseInt(localStorage.getItem('2048-move-threshold') || '15'); // Pixels needed to register as new direction
                 const actualMovement = Math.sqrt(
                     Math.pow(currentX - this.dragStartX, 2) + 
                     Math.pow(currentY - this.dragStartY, 2)
@@ -409,7 +409,7 @@ class Game2048 {
             // Check if we're waiting for direction change
             if (this.waitingForNewDirection) {
                 // Calculate movement from last executed position
-                const moveThreshold = 30; // Pixels needed to register as new direction
+                const moveThreshold = parseInt(localStorage.getItem('2048-move-threshold') || '15'); // Pixels needed to register as new direction
                 const actualMovement = Math.sqrt(
                     Math.pow(currentX - this.dragStartX, 2) + 
                     Math.pow(currentY - this.dragStartY, 2)

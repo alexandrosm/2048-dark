@@ -274,6 +274,15 @@
                     Higher values = more sensitive swipes
                 </div>
             </div>
+            
+            <div class="slider-container" style="margin-top: 30px;">
+                <div class="slider-label">Direction Change Threshold</div>
+                <div class="slider-value" id="threshold-value">15px</div>
+                <input type="range" id="threshold-slider" min="5" max="50" step="5" value="15">
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
+                    Pixels needed to allow repeated moves in same direction
+                </div>
+            </div>
         </div>
         
         <div class="settings-section">
@@ -352,6 +361,22 @@
             const value = e.target.value;
             valueDisplay.textContent = `${value}x`;
             localStorage.setItem('2048-multiplier', value);
+        });
+        
+        // Handle threshold slider
+        const thresholdSlider = document.getElementById('threshold-slider');
+        const thresholdDisplay = document.getElementById('threshold-value');
+        
+        // Load saved threshold
+        const savedThreshold = localStorage.getItem('2048-move-threshold') || '15';
+        thresholdSlider.value = savedThreshold;
+        thresholdDisplay.textContent = `${savedThreshold}px`;
+        
+        // Update on change
+        thresholdSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            thresholdDisplay.textContent = `${value}px`;
+            localStorage.setItem('2048-move-threshold', value);
         });
         
         // Handle gameplay options
