@@ -309,8 +309,20 @@
                     <span style="color: rgba(255, 255, 255, 0.8); font-size: 16px;">Lucky 8s (1% chance)</span>
                     <input type="checkbox" id="lucky-eights" style="width: 20px; height: 20px; cursor: pointer;">
                 </label>
-                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-bottom: 20px;">
                     1% chance to spawn an 8 tile
+                </div>
+                
+                <div style="margin-top: 25px;">
+                    <label style="color: rgba(255, 255, 255, 0.8); font-size: 16px; display: block; margin-bottom: 10px;">Undo Levels</label>
+                    <select id="undo-levels" style="width: 100%; padding: 10px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.8); border-radius: 5px; font-size: 16px;">
+                        <option value="0" style="background: #000;">None - No undos allowed</option>
+                        <option value="1" style="background: #000;">Single - One undo only</option>
+                        <option value="-1" style="background: #000;" selected>Unlimited - Undo anytime</option>
+                    </select>
+                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-top: 8px;">
+                        Control how many times you can undo moves
+                    </div>
                 </div>
             </div>
         </div>
@@ -407,10 +419,12 @@
         // Handle gameplay options
         const startWithOnes = document.getElementById('start-with-ones');
         const luckyEights = document.getElementById('lucky-eights');
+        const undoLevels = document.getElementById('undo-levels');
         
         // Load saved settings
         startWithOnes.checked = localStorage.getItem('2048-start-with-ones') === 'true';
         luckyEights.checked = localStorage.getItem('2048-lucky-eights') === 'true';
+        undoLevels.value = localStorage.getItem('2048-undo-levels') || '-1';
         
         // Save on change
         startWithOnes.addEventListener('change', (e) => {
@@ -419,6 +433,10 @@
         
         luckyEights.addEventListener('change', (e) => {
             localStorage.setItem('2048-lucky-eights', e.target.checked);
+        });
+        
+        undoLevels.addEventListener('change', (e) => {
+            localStorage.setItem('2048-undo-levels', e.target.value);
         });
     </script>
     <script src="settings.js"></script>

@@ -22,6 +22,7 @@ class Game2048 {
         this.lastMoveTime = 0;
         this.cellSize = 70; // Default value
         this.gapSize = 12; // Default value
+        this.undosUsedThisGame = 0; // Track undos used in current game
         this.init();
     }
 
@@ -44,6 +45,9 @@ class Game2048 {
             // Try to load saved game state, otherwise start new game
             if (!this.loadGameState()) {
                 this.startNewGame();
+            } else {
+                // Update undo button for loaded game
+                this.updateUndoButton();
             }
         }
     }
@@ -710,12 +714,16 @@ class Game2048 {
         this.tileId = 0;
         this.history = [];
         this.undoCount = 0;
+        this.undosUsedThisGame = 0; // Reset undo usage for new game
         this.updateScore();
         this.addNewTile();
         this.addNewTile();
         
         // Clear saved state
         localStorage.removeItem('2048-gamestate');
+        
+        // Update undo button state
+        this.updateUndoButton();
     }
 
     createTileElement(value, row, col) {
@@ -1344,12 +1352,25 @@ class Game2048 {
         });
         
         this.history.push(state);
+        
+        // Update undo button when history changes
+        this.updateUndoButton();
     }
 
     undo() {
         if (this.history.length === 0) return;
         
+        // Check undo level setting
+        const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '-1');
+        
+        // If no undos allowed
+        if (undoLevel === 0) return;
+        
+        // If single undo only and already used
+        if (undoLevel === 1 && this.undosUsedThisGame >= 1) return;
+        
         this.undoCount++;
+        this.undosUsedThisGame++;
         const state = this.history.pop();
         this.grid = state.grid;
         this.score = state.score;
@@ -1375,6 +1396,35 @@ class Game2048 {
         
         // Hide game over overlay if it's showing
         this.hideGameOver();
+        
+        // Update undo button state
+        this.updateUndoButton();
+    }
+    
+    updateUndoButton() {
+        const undoButton = document.querySelector('button[onclick="game.undo()"]');
+        if (!undoButton) return;
+        
+        const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '-1');
+        let isDisabled = false;
+        
+        // Check if undo should be disabled
+        if (this.history.length === 0) {
+            isDisabled = true;
+        } else if (undoLevel === 0) {
+            isDisabled = true;
+        } else if (undoLevel === 1 && this.undosUsedThisGame >= 1) {
+            isDisabled = true;
+        }
+        
+        // Update button appearance
+        if (isDisabled) {
+            undoButton.style.opacity = '0.3';
+            undoButton.style.cursor = 'not-allowed';
+        } else {
+            undoButton.style.opacity = '1';
+            undoButton.style.cursor = 'pointer';
+        }
     }
 }
 

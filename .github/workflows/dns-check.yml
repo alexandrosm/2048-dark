@@ -1,0 +1,34 @@
+name: DNS Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:  # Manual trigger
+
+jobs:
+  check-dns:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        pip install requests
+    
+    - name: Check DNS propagation
+      env:
+        GANDI_PAT: ${{ secrets.GANDI_PAT }}
+      run: |
+        cd scripts
+        python3 gandi_dns.py verify dark2048.com
+    
+    - name: Check HTTPS certificate
+      run: |
+        echo "Checking SSL certificate..."
+        timeout 10 curl -Is https://dark2048.com | head -1 || echo "HTTPS not ready yet"
