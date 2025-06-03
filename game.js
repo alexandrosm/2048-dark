@@ -1449,7 +1449,15 @@ class Game2048 {
     }
 }
 
-const game = new Game2048();
+// Wait for DOM to be ready before initializing the game
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.game = new Game2048();
+    });
+} else {
+    // DOM is already ready
+    window.game = new Game2048();
+}
 
 // PWA Support
 if ('serviceWorker' in navigator) {
