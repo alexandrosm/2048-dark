@@ -87,6 +87,7 @@ class Game2048 {
         this.setupGrid();
         this.setupEventListeners();
         this.setupBatteryMonitoring();
+        this.setupVersionDisplay();
         
         // Check if launched from shortcut to start new game
         const urlParams = new URLSearchParams(window.location.search);
@@ -354,6 +355,46 @@ class Game2048 {
             if (batteryOverlay) {
                 batteryOverlay.remove();
             }
+        }
+    }
+
+    setupVersionDisplay() {
+        const versionDisplay = document.querySelector('.version-display');
+        const versionText = document.querySelector('.version-text');
+        
+        if (versionDisplay && versionText) {
+            // Set version from config or default
+            const version = window.APP_VERSION || 'v1.0.0';
+            versionText.textContent = version.startsWith('v') ? version : `v${version}`;
+            
+            // Add mobile tap support
+            let tapTimeout;
+            versionDisplay.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                versionDisplay.classList.add('show-version');
+                
+                // Clear any existing timeout
+                clearTimeout(tapTimeout);
+                
+                // Hide after 3 seconds
+                tapTimeout = setTimeout(() => {
+                    versionDisplay.classList.remove('show-version');
+                }, 3000);
+            });
+            
+            // Also handle click for desktop testing
+            versionDisplay.addEventListener('click', (e) => {
+                e.preventDefault();
+                versionDisplay.classList.toggle('show-version');
+                
+                // Auto-hide after 3 seconds if shown
+                if (versionDisplay.classList.contains('show-version')) {
+                    clearTimeout(tapTimeout);
+                    tapTimeout = setTimeout(() => {
+                        versionDisplay.classList.remove('show-version');
+                    }, 3000);
+                }
+            });
         }
     }
 
