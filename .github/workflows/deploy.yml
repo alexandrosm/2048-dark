@@ -19,6 +19,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for GitVersion
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v0
+        with:
+          versionSpec: '5.x'
+
+      - name: Determine Version
+        id: gitversion
+        uses: gittools/actions/gitversion/execute@v0
+        with:
+          useConfigFile: true
+
+      - name: Display version
+        run: |
+          echo "Version: ${{ steps.gitversion.outputs.semVer }}"
+          echo "Full version: ${{ steps.gitversion.outputs.fullSemVer }}"
 
       - name: Run tests
         run: |
@@ -42,6 +60,7 @@ jobs:
         env:
           GA4_ID: ${{ secrets.GA4_ID }}
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          APP_VERSION: ${{ steps.gitversion.outputs.semVer }}
         run: |
           cat > config.js << EOF
           window.ANALYTICS_CONFIG = {
@@ -51,6 +70,7 @@ jobs:
               SENTRY_TRACE_RATE: 0.1,
               SENTRY_REPLAY_RATE: 0.1
           };
+          window.APP_VERSION = '${APP_VERSION}';
           EOF
 
       - name: Setup Pages

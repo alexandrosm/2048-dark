@@ -9,7 +9,12 @@
     "preview": "vite preview",
     "serve": "npx http-server -p 8080 -c-1",
     "test": "./scripts/test.sh",
-    "lint": "for f in *.js; do echo \"Checking $f...\"; node -c \"$f\" || exit 1; done"
+    "lint": "for f in *.js; do echo \"Checking $f...\"; node -c \"$f\" || exit 1; done",
+    "version": "./scripts/version.sh",
+    "version:show": "./scripts/version.sh show",
+    "version:next": "./scripts/version.sh next",
+    "version:update": "./scripts/version.sh update-package",
+    "version:tag": "./scripts/version.sh tag"
   },
   "keywords": [
     "2048",
