@@ -9,10 +9,18 @@
     "preview": "vite preview",
     "serve": "npx http-server -p 8080 -c-1"
   },
-  "keywords": ["2048", "game", "pwa"],
+  "keywords": [
+    "2048",
+    "game",
+    "pwa"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "@sentry/browser": "^9.25.1",
+    "@sentry/tracing": "^7.120.3"
   }
 }

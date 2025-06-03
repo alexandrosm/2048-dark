@@ -1,6 +1,15 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  build: {
+    outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: 'index.html',
+        settings: 'settings.html'
+      }
+    }
+  },
   server: {
     host: true, // Listen on all addresses (allows access from Windows host)
     port: 5173,

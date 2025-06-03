@@ -48,42 +48,56 @@
         }
     </script>
     
-    <!-- Sentry Error Tracking -->
-    <script
-        src="https://browser.sentry-cdn.com/7.89.0/bundle.tracing.min.js"
-        crossorigin="anonymous"
-    ></script>
+    <!-- Sentry Error Tracking (may be blocked by ad blockers) -->
     <script>
-        // Initialize Sentry if configured and error tracking is enabled
-        if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.SENTRY_DSN && 
-            !window.ANALYTICS_CONFIG.SENTRY_DSN.includes('YOUR_SENTRY_DSN') &&
-            localStorage.getItem('2048-error-tracking-enabled') !== 'false' && 
-            typeof Sentry !== 'undefined') {
-            Sentry.init({
-                dsn: window.ANALYTICS_CONFIG.SENTRY_DSN,
-                integrations: [
-                    new Sentry.BrowserTracing(),
-                ],
-                tracesSampleRate: window.ANALYTICS_CONFIG.SENTRY_SAMPLE_RATE || 0.1,
-                environment: window.location.hostname === 'localhost' ? 'development' : 'production',
-                beforeSend: function(event, hint) {
-                    // Filter out non-application errors
-                    if (event.exception && event.exception.values && event.exception.values[0]) {
-                        const error = event.exception.values[0];
-                        // Only send errors from our own code
-                        if (error.stacktrace && error.stacktrace.frames) {
-                            const hasOurCode = error.stacktrace.frames.some(frame => 
-                                frame.filename && (frame.filename.includes('game.js') || 
-                                frame.filename.includes('settings.js') ||
-                                frame.filename.includes('sw.js'))
-                            );
-                            if (!hasOurCode) return null;
-                        }
+        // Attempt to load Sentry, but handle failures gracefully
+        (function() {
+            if (!window.ANALYTICS_CONFIG || !window.ANALYTICS_CONFIG.SENTRY_DSN || 
+                window.ANALYTICS_CONFIG.SENTRY_DSN.includes('YOUR_SENTRY_DSN') ||
+                localStorage.getItem('2048-error-tracking-enabled') === 'false') {
+                return;
+            }
+            
+            var script = document.createElement('script');
+            script.src = 'https://browser.sentry-cdn.com/7.89.0/bundle.tracing.min.js';
+            script.crossOrigin = 'anonymous';
+            script.onerror = function() {
+                console.log('Sentry script blocked or failed to load');
+            };
+            script.onload = function() {
+                if (typeof Sentry !== 'undefined') {
+                    try {
+                        Sentry.init({
+                            dsn: window.ANALYTICS_CONFIG.SENTRY_DSN,
+                            integrations: [
+                                new Sentry.BrowserTracing(),
+                            ],
+                            tracesSampleRate: window.ANALYTICS_CONFIG.SENTRY_TRACE_RATE || 0.1,
+                            environment: window.location.hostname === 'localhost' ? 'development' : 'production',
+                            beforeSend: function(event, hint) {
+                                // Filter out non-application errors
+                                if (event.exception && event.exception.values && event.exception.values[0]) {
+                                    const error = event.exception.values[0];
+                                    // Only send errors from our own code
+                                    if (error.stacktrace && error.stacktrace.frames) {
+                                        const hasOurCode = error.stacktrace.frames.some(frame => 
+                                            frame.filename && (frame.filename.includes('game.js') || 
+                                            frame.filename.includes('settings.js') ||
+                                            frame.filename.includes('sw.js'))
+                                        );
+                                        if (!hasOurCode) return null;
+                                    }
+                                }
+                                return event;
+                            }
+                        });
+                    } catch (e) {
+                        console.log('Failed to initialize Sentry:', e);
                     }
-                    return event;
                 }
-            });
-        }
+            };
+            document.head.appendChild(script);
+        })();
     </script>
 </head>
 <body>
