@@ -37,13 +37,22 @@
             navigator.doNotTrack !== '1' && 
             window.doNotTrack !== '1' && 
             navigator.msDoNotTrack !== '1') {
+            console.log('Initializing GA4 with ID:', window.ANALYTICS_CONFIG.GA4_ID);
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag; // Make gtag globally available
             gtag('js', new Date());
             gtag('config', window.ANALYTICS_CONFIG.GA4_ID, {
                 anonymize_ip: true,
                 cookie_flags: 'SameSite=None;Secure',
                 debug_mode: window.ANALYTICS_CONFIG.GA4_DEBUG_MODE || false
+            });
+        } else {
+            console.log('GA4 not initialized:', {
+                config: !!window.ANALYTICS_CONFIG,
+                ga4_id: window.ANALYTICS_CONFIG?.GA4_ID,
+                analytics_enabled: localStorage.getItem('2048-analytics-enabled'),
+                dnt: navigator.doNotTrack
             });
         }
     </script>

@@ -3,11 +3,14 @@ class Game2048 {
         // Track analytics event helper
         this.trackEvent = (action, category = 'game', label = null, value = null) => {
             if (typeof gtag !== 'undefined' && localStorage.getItem('2048-analytics-enabled') !== 'false') {
+                console.log('GA4 Event:', action, category, label, value);
                 gtag('event', action, {
                     event_category: category,
                     event_label: label,
                     value: value
                 });
+            } else {
+                console.log('GA4 not available or disabled');
             }
         };
         
@@ -100,6 +103,12 @@ class Game2048 {
             window.doNotTrack !== '1' && 
             navigator.msDoNotTrack !== '1') {
             try {
+                console.log('GA4 Event:', eventName, {
+                    game_score: this.score,
+                    high_score: this.highScore,
+                    dark_mode: this.darkMode,
+                    ...parameters
+                });
                 gtag('event', eventName, {
                     game_score: this.score,
                     high_score: this.highScore,
