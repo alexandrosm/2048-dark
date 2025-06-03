@@ -22,38 +22,53 @@
     
     <!-- Google Analytics -->
     <script>
-        // Load GA4 script only if config exists
-        if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.GA4_ID && window.ANALYTICS_CONFIG.GA4_ID !== 'G-PLACEHOLDER_ID') {
-            const script = document.createElement('script');
-            script.async = true;
-            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.ANALYTICS_CONFIG.GA4_ID;
-            document.head.appendChild(script);
+        // Initialize GA4 after config loads
+        function initializeGA4() {
+            if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.GA4_ID && window.ANALYTICS_CONFIG.GA4_ID !== 'G-PLACEHOLDER_ID' &&
+                localStorage.getItem('2048-analytics-enabled') !== 'false' && 
+                navigator.doNotTrack !== '1' && 
+                window.doNotTrack !== '1' && 
+                navigator.msDoNotTrack !== '1') {
+                
+                console.log('Loading GA4 script for ID:', window.ANALYTICS_CONFIG.GA4_ID);
+                
+                // Create and load the gtag script
+                const script = document.createElement('script');
+                script.async = true;
+                script.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.ANALYTICS_CONFIG.GA4_ID;
+                script.onload = function() {
+                    console.log('GA4 script loaded, initializing...');
+                    window.dataLayer = window.dataLayer || [];
+                    function gtag(){dataLayer.push(arguments);}
+                    window.gtag = gtag;
+                    gtag('js', new Date());
+                    gtag('config', window.ANALYTICS_CONFIG.GA4_ID, {
+                        anonymize_ip: true,
+                        cookie_flags: 'SameSite=None;Secure',
+                        debug_mode: window.ANALYTICS_CONFIG.GA4_DEBUG_MODE || false
+                    });
+                    console.log('GA4 initialized successfully');
+                };
+                script.onerror = function() {
+                    console.error('Failed to load GA4 script');
+                };
+                document.head.appendChild(script);
+            } else {
+                console.log('GA4 not initialized:', {
+                    config: !!window.ANALYTICS_CONFIG,
+                    ga4_id: window.ANALYTICS_CONFIG?.GA4_ID,
+                    analytics_enabled: localStorage.getItem('2048-analytics-enabled'),
+                    dnt: navigator.doNotTrack
+                });
+            }
         }
-    </script>
-    <script>
-        // Initialize Google Analytics if configured and enabled
-        if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.GA4_ID && window.ANALYTICS_CONFIG.GA4_ID !== 'G-PLACEHOLDER_ID' &&
-            localStorage.getItem('2048-analytics-enabled') !== 'false' && 
-            navigator.doNotTrack !== '1' && 
-            window.doNotTrack !== '1' && 
-            navigator.msDoNotTrack !== '1') {
-            console.log('Initializing GA4 with ID:', window.ANALYTICS_CONFIG.GA4_ID);
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            window.gtag = gtag; // Make gtag globally available
-            gtag('js', new Date());
-            gtag('config', window.ANALYTICS_CONFIG.GA4_ID, {
-                anonymize_ip: true,
-                cookie_flags: 'SameSite=None;Secure',
-                debug_mode: window.ANALYTICS_CONFIG.GA4_DEBUG_MODE || false
-            });
+        
+        // Wait for config to load, then initialize GA4
+        if (window.ANALYTICS_CONFIG) {
+            initializeGA4();
         } else {
-            console.log('GA4 not initialized:', {
-                config: !!window.ANALYTICS_CONFIG,
-                ga4_id: window.ANALYTICS_CONFIG?.GA4_ID,
-                analytics_enabled: localStorage.getItem('2048-analytics-enabled'),
-                dnt: navigator.doNotTrack
-            });
+            // If config hasn't loaded yet, wait a bit
+            setTimeout(initializeGA4, 100);
         }
     </script>
     

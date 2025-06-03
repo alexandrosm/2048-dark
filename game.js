@@ -66,6 +66,11 @@ class Game2048 {
         };
         
         this.init();
+        
+        // Send pageview event after initialization
+        setTimeout(() => {
+            this.trackEvent('page_view', 'navigation', window.location.pathname);
+        }, 1000);
     }
 
     init() {
