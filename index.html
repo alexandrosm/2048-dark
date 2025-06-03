@@ -30,14 +30,12 @@
                 window.doNotTrack !== '1' && 
                 navigator.msDoNotTrack !== '1') {
                 
-                console.log('Loading GA4 script for ID:', window.ANALYTICS_CONFIG.GA4_ID);
                 
                 // Create and load the gtag script
                 const script = document.createElement('script');
                 script.async = true;
                 script.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.ANALYTICS_CONFIG.GA4_ID;
                 script.onload = function() {
-                    console.log('GA4 script loaded, initializing...');
                     window.dataLayer = window.dataLayer || [];
                     function gtag(){dataLayer.push(arguments);}
                     window.gtag = gtag;
@@ -47,19 +45,11 @@
                         cookie_flags: 'SameSite=None;Secure',
                         debug_mode: window.ANALYTICS_CONFIG.GA4_DEBUG_MODE || false
                     });
-                    console.log('GA4 initialized successfully');
                 };
                 script.onerror = function() {
                     console.error('Failed to load GA4 script');
                 };
                 document.head.appendChild(script);
-            } else {
-                console.log('GA4 not initialized:', {
-                    config: !!window.ANALYTICS_CONFIG,
-                    ga4_id: window.ANALYTICS_CONFIG?.GA4_ID,
-                    analytics_enabled: localStorage.getItem('2048-analytics-enabled'),
-                    dnt: navigator.doNotTrack
-                });
             }
         }
         
@@ -94,22 +84,10 @@
                         Sentry.init({
                             dsn: window.ANALYTICS_CONFIG.SENTRY_DSN,
                             integrations: [
-                                new Sentry.BrowserTracing(),
-                                new Sentry.Replay({
-                                    // Mask all text content, but keep media playback
-                                    maskAllText: true,
-                                    maskAllInputs: true,
-                                    blockAllMedia: false,
-                                    // Sampling for privacy and performance
-                                    sessionSampleRate: window.ANALYTICS_CONFIG.SENTRY_REPLAY_RATE || 0.1,
-                                    errorSampleRate: 1.0
-                                })
+                                new Sentry.BrowserTracing()
                             ],
                             // Performance Monitoring
                             tracesSampleRate: window.ANALYTICS_CONFIG.SENTRY_TRACE_RATE || 0.1,
-                            // Session Replay
-                            replaysSessionSampleRate: window.ANALYTICS_CONFIG.SENTRY_REPLAY_RATE || 0.1,
-                            replaysOnErrorSampleRate: 1.0,
                             // Environment
                             environment: window.location.hostname === 'localhost' ? 'development' : 'production',
                             // Privacy settings
@@ -135,7 +113,6 @@
                                 return event;
                             }
                         });
-                        console.log('Sentry initialized with tracing and replay');
                     } catch (e) {
                         console.log('Failed to initialize Sentry:', e);
                     }

@@ -3,14 +3,11 @@ class Game2048 {
         // Track analytics event helper
         this.trackEvent = (action, category = 'game', label = null, value = null) => {
             if (typeof gtag !== 'undefined' && localStorage.getItem('2048-analytics-enabled') !== 'false') {
-                console.log('GA4 Event:', action, category, label, value);
                 gtag('event', action, {
                     event_category: category,
                     event_label: label,
                     value: value
                 });
-            } else {
-                console.log('GA4 not available or disabled');
             }
         };
         
@@ -73,7 +70,6 @@ class Game2048 {
             
             // Test Sentry error (remove this after testing)
             if (window.location.search.includes('test-sentry')) {
-                console.log('Testing Sentry error tracking...');
                 throw new Error('Test error for Sentry verification');
             }
         }, 1000);
@@ -121,12 +117,6 @@ class Game2048 {
             window.doNotTrack !== '1' && 
             navigator.msDoNotTrack !== '1') {
             try {
-                console.log('GA4 Event:', eventName, {
-                    game_score: this.score,
-                    high_score: this.highScore,
-                    dark_mode: this.darkMode,
-                    ...parameters
-                });
                 gtag('event', eventName, {
                     game_score: this.score,
                     high_score: this.highScore,
@@ -490,8 +480,7 @@ class Game2048 {
         // Then check every 30 seconds
         checkInterval = setInterval(checkForUpdate, 30000);
         
-        // Log that dev mode is active
-        console.log('Dev mode active - checking for updates every 30 seconds');
+        // Dev mode is active - checking for updates every 30 seconds
         
         // Also show a small indicator
         const devIndicator = document.createElement('div');
