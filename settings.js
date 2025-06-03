@@ -253,4 +253,58 @@ class Analytics {
 // Initialize analytics when page loads
 document.addEventListener('DOMContentLoaded', () => {
     new Analytics();
+    
+    // Handle download buttons
+    const downloadHistoryBtn = document.getElementById('download-history');
+    const downloadAllHistoriesBtn = document.getElementById('download-all-histories');
+    
+    downloadHistoryBtn.addEventListener('click', () => {
+        try {
+            // Get current game history if available
+            if (window.opener && window.opener.game) {
+                const history = window.opener.game.exportGameHistory();
+                downloadJSON(history, `2048-game-history-${history.gameId}.json`);
+            } else {
+                // No current game, show message
+                alert('No active game found. Please return to the game and try again.');
+            }
+        } catch (error) {
+            console.error('Failed to download game history:', error);
+            alert('Failed to download game history. Please try again.');
+        }
+    });
+    
+    downloadAllHistoriesBtn.addEventListener('click', () => {
+        try {
+            const histories = JSON.parse(localStorage.getItem('2048-game-histories') || '[]');
+            if (histories.length === 0) {
+                alert('No game histories found. Play some games first!');
+                return;
+            }
+            
+            const exportData = {
+                exportTime: new Date().toISOString(),
+                gameCount: histories.length,
+                histories: histories
+            };
+            
+            downloadJSON(exportData, `2048-all-histories-${Date.now()}.json`);
+        } catch (error) {
+            console.error('Failed to download all histories:', error);
+            alert('Failed to download game histories. Please try again.');
+        }
+    });
+    
+    function downloadJSON(data, filename) {
+        const jsonStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    }
 });

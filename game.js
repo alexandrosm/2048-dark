@@ -28,6 +28,20 @@ class Game2048 {
         this.pinchStartDistance = 0; // For pinch gesture tracking
         this.isPinching = false; // Track if we're in a pinch gesture
         this.isTwoFingerSwiping = false; // Track if we're in a two-finger swipe
+        
+        // Game history for debugging
+        this.gameHistory = {
+            gameId: this.generateGameId(),
+            startTime: new Date().toISOString(),
+            moves: [],
+            tileSpawns: [],
+            scoreChanges: [],
+            stateSnapshots: [],
+            events: [],
+            errors: [],
+            settings: this.captureCurrentSettings()
+        };
+        
         this.init();
     }
 
@@ -789,7 +803,23 @@ class Game2048 {
         // Save the previous game if it had a score
         if (this.score > 0) {
             this.saveCompletedGame();
+            this.saveGameHistory(); // Save debug history
         }
+        
+        // Reset game history for new game
+        this.gameHistory = {
+            gameId: this.generateGameId(),
+            startTime: new Date().toISOString(),
+            moves: [],
+            tileSpawns: [],
+            scoreChanges: [],
+            stateSnapshots: [],
+            events: [],
+            errors: [],
+            settings: this.captureCurrentSettings()
+        };
+        
+        this.logEvent('game_started', { reason: 'new_game_button' });
         
         this.grid = Array(this.size).fill().map(() => Array(this.size).fill(0));
         this.score = 0;
@@ -871,6 +901,9 @@ class Game2048 {
                 element: tileElement,
                 merged: false
             });
+            
+            // Log tile spawn for history
+            this.logTileSpawn(randomCell.row, randomCell.col, value, rand);
         }
     }
 
@@ -899,6 +932,7 @@ class Game2048 {
         
         this.moveInProgress = true;
         const previousGrid = JSON.stringify(this.grid);
+        const previousScore = this.score;
         const movements = [];
         
         // Clear any preview positions since we're doing an actual move
@@ -910,6 +944,9 @@ class Game2048 {
         
         // Reset merged state for all tiles
         this.tiles.forEach(tile => tile.merged = false);
+        
+        // Log move attempt
+        const moveStartTime = Date.now();
         
         switch(direction) {
             case 'left':
@@ -927,6 +964,8 @@ class Game2048 {
         }
 
         if (JSON.stringify(this.grid) !== previousGrid) {
+            // Log successful move
+            this.logMove(direction, previousScore, this.score, movements, Date.now() - moveStartTime);
             // Check if this move is the same as the last undone move
             if (this.lastUndoneDirection === direction && this.undosUsedThisGame > 0) {
                 // User is redoing the same move they just undid, restore their undo
@@ -950,6 +989,7 @@ class Game2048 {
                     if (this.checkGameOver()) {
                         // Reset undo usage when game ends to allow undo on game over screen
                         this.undosUsedThisGame = 0;
+                        this.logEvent('game_over', { finalScore: this.score, moves: this.gameHistory.moves.length });
                         setTimeout(() => {
                             this.showGameOver();
                         }, 300);
@@ -961,6 +1001,7 @@ class Game2048 {
         } else {
             // No valid move - just remove from history
             this.history.pop();
+            this.logEvent('invalid_move', { direction, reason: 'no_tiles_moved' });
             this.moveInProgress = false;
         }
     }
@@ -1330,6 +1371,8 @@ class Game2048 {
     }
 
     updateScore() {
+        const previousScore = parseInt(document.querySelector('.score').textContent.split(' ')[0]) || 0;
+        
         // Update high score if current score is higher
         if (this.score > this.highScore) {
             this.highScore = this.score;
@@ -1344,6 +1387,11 @@ class Game2048 {
             document.querySelector('.score').textContent = `${this.score}`;
         } else {
             document.querySelector('.score').textContent = `${this.score} / ${percentage}%`;
+        }
+        
+        // Log score change if different
+        if (previousScore !== this.score && this.gameHistory) {
+            this.logScoreChange(previousScore, this.score);
         }
     }
 
@@ -1533,6 +1581,14 @@ class Game2048 {
         this.undosUsedThisGame++;
         const state = this.history.pop();
         
+        // Log undo action
+        this.logEvent('undo', { 
+            undoneDirection: state.lastDirection,
+            undoCount: this.undoCount,
+            scoreBeforeUndo: this.score,
+            scoreAfterUndo: state.score
+        });
+        
         // Store the direction of the move we're undoing
         this.lastUndoneDirection = state.lastDirection;
         
@@ -1600,6 +1656,150 @@ if (document.readyState === 'loading') {
 } else {
     // DOM is already ready
     window.game = new Game2048();
+}
+
+    // Game history tracking methods
+    generateGameId() {
+        return `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    captureCurrentSettings() {
+        return {
+            darkMode: this.darkMode,
+            dragMultiplier: this.dragMultiplier,
+            zoomLevel: this.zoomLevel,
+            startWithOnes: localStorage.getItem('2048-start-with-ones') === 'true',
+            luckyEights: localStorage.getItem('2048-lucky-eights') === 'true',
+            undoLevels: localStorage.getItem('2048-undo-levels') || '1',
+            moveCooldown: localStorage.getItem('2048-move-cooldown') || '0',
+            animationSpeed: localStorage.getItem('2048-animation-speed') || '50',
+            batteryWarning: localStorage.getItem('2048-battery-warning') !== 'false',
+            doubleTapUndo: localStorage.getItem('2048-double-tap-undo') !== 'false',
+            twoFingerMenu: localStorage.getItem('2048-two-finger-menu') !== 'false'
+        };
+    }
+    
+    logMove(direction, previousScore, newScore, movements, duration) {
+        const moveData = {
+            timestamp: new Date().toISOString(),
+            direction,
+            previousScore,
+            newScore,
+            scoreGained: newScore - previousScore,
+            duration,
+            tilesMovedCount: movements.length,
+            mergedTiles: movements.filter(m => m.merged).length,
+            gridSnapshot: this.captureGridSnapshot()
+        };
+        
+        this.gameHistory.moves.push(moveData);
+        
+        // Take periodic state snapshots (every 10 moves)
+        if (this.gameHistory.moves.length % 10 === 0) {
+            this.captureStateSnapshot();
+        }
+    }
+    
+    logTileSpawn(row, col, value, randomValue) {
+        this.gameHistory.tileSpawns.push({
+            timestamp: new Date().toISOString(),
+            row,
+            col,
+            value,
+            randomValue,
+            emptyCellsCount: this.getEmptyCells().length + 1 // +1 because we just filled one
+        });
+    }
+    
+    logScoreChange(previousScore, newScore) {
+        this.gameHistory.scoreChanges.push({
+            timestamp: new Date().toISOString(),
+            previousScore,
+            newScore,
+            change: newScore - previousScore
+        });
+    }
+    
+    logEvent(eventType, data) {
+        this.gameHistory.events.push({
+            timestamp: new Date().toISOString(),
+            type: eventType,
+            data
+        });
+    }
+    
+    logError(error, context) {
+        this.gameHistory.errors.push({
+            timestamp: new Date().toISOString(),
+            error: error.toString(),
+            stack: error.stack,
+            context
+        });
+    }
+    
+    captureGridSnapshot() {
+        const snapshot = [];
+        for (let row = 0; row < this.size; row++) {
+            snapshot.push([...this.grid[row]]);
+        }
+        return snapshot;
+    }
+    
+    captureStateSnapshot() {
+        this.gameHistory.stateSnapshots.push({
+            timestamp: new Date().toISOString(),
+            moveNumber: this.gameHistory.moves.length,
+            score: this.score,
+            grid: this.captureGridSnapshot(),
+            tileCount: this.tiles.size,
+            highestTile: Math.max(...Array.from(this.tiles.values()).map(t => t.value)),
+            undosUsed: this.undoCount
+        });
+    }
+    
+    saveGameHistory() {
+        try {
+            // Add final state
+            this.gameHistory.endTime = new Date().toISOString();
+            this.gameHistory.finalScore = this.score;
+            this.gameHistory.totalMoves = this.gameHistory.moves.length;
+            this.gameHistory.totalUndos = this.undoCount;
+            
+            // Store in localStorage (keep last 10 games)
+            const historyKey = '2048-game-histories';
+            const histories = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            histories.push(this.gameHistory);
+            
+            // Keep only last 10 games
+            if (histories.length > 10) {
+                histories.shift();
+            }
+            
+            localStorage.setItem(historyKey, JSON.stringify(histories));
+        } catch (error) {
+            console.error('Failed to save game history:', error);
+        }
+    }
+    
+    exportGameHistory() {
+        const history = {
+            ...this.gameHistory,
+            exportTime: new Date().toISOString(),
+            currentState: {
+                score: this.score,
+                grid: this.captureGridSnapshot(),
+                tiles: Array.from(this.tiles.values()).map(t => ({
+                    id: t.id,
+                    value: t.value,
+                    row: t.row,
+                    col: t.col
+                })),
+                moveCount: this.gameHistory.moves.length
+            }
+        };
+        
+        return history;
+    }
 }
 
 // PWA Support
