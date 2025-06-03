@@ -76,9 +76,9 @@ class Analytics {
         const chartHeight = this.canvas.height - padding * 2;
         
         // Get dark mode level for opacity adjustments
-        const darkMode = parseInt(localStorage.getItem('2048-darkmode') || '0');
-        const opacityMultiplier = darkMode === 2 ? 0.3 : darkMode === 1 ? 0.6 : 1;
-        const isBrightMode = darkMode === 3;
+        const darkMode = 0; // Always dark mode level 0
+        const opacityMultiplier = 1;
+        const isBrightMode = false;
         
         // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

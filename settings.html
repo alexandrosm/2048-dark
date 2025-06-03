@@ -152,73 +152,10 @@
             opacity: 0.5;
         }
         
-        body.dark-level-2 .settings-container {
-            opacity: 0.2;
-        }
-        
         /* Keep back button visible in dark modes */
-        body.dark-level-1 .back-button,
-        body.dark-level-2 .back-button {
+        body.dark-level-1 .back-button {
             opacity: 1;
             color: rgba(255, 255, 255, 0.8);
-        }
-        
-        /* Bright mode styles */
-        body.bright-mode {
-            background: #faf8f5;
-            color: #776e65;
-        }
-        
-        body.bright-mode .back-button {
-            color: #776e65;
-        }
-        
-        body.bright-mode .back-button:hover {
-            color: #8f7a66;
-        }
-        
-        body.bright-mode .settings-section {
-            background: rgba(187, 173, 160, 0.1);
-        }
-        
-        body.bright-mode h1, body.bright-mode h2 {
-            color: #776e65;
-        }
-        
-        body.bright-mode .slider-label {
-            color: #776e65;
-        }
-        
-        body.bright-mode .slider-value {
-            color: #8f7a66;
-        }
-        
-        body.bright-mode input[type="range"] {
-            background: rgba(187, 173, 160, 0.3);
-        }
-        
-        body.bright-mode input[type="range"]::-webkit-slider-thumb {
-            background: #8f7a66;
-        }
-        
-        body.bright-mode input[type="range"]::-moz-range-thumb {
-            background: #8f7a66;
-        }
-        
-        body.bright-mode .stat {
-            color: #776e65;
-        }
-        
-        body.bright-mode .stat-value {
-            color: #8f7a66;
-        }
-        
-        body.bright-mode .stat-label {
-            color: #776e65;
-        }
-        
-        body.bright-mode .no-data {
-            color: #776e65;
         }
         
         /* Checkbox styles */
@@ -245,16 +182,6 @@
             transform: translate(-50%, -50%);
             color: white;
             font-size: 14px;
-        }
-        
-        body.bright-mode input[type="checkbox"] {
-            background: rgba(187, 173, 160, 0.3);
-            border-color: #8f7a66;
-        }
-        
-        body.bright-mode input[type="checkbox"]:checked {
-            background: #8f7a66;
-            border-color: #8f7a66;
         }
     </style>
 </head>
@@ -364,9 +291,9 @@
     </div>
     
     <script>
-        // Apply dark mode setting from main game
-        const darkMode = parseInt(localStorage.getItem('2048-darkmode') || '0');
-        document.body.className = darkMode === 3 ? 'bright-mode' : `dark-level-${darkMode}`;
+        // Always apply dark mode level 0
+        const darkMode = 0;
+        document.body.className = 'dark-level-0';
         
         // Handle multiplier slider
         const slider = document.getElementById('multiplier-slider');

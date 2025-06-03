@@ -29,35 +29,7 @@ body.dark-level-1 {
     background: #000;
 }
 
-body.dark-level-2 {
-    background: #000;
-}
 
-body.bright-mode {
-    background: #faf8f5;
-    color: #776e65;
-}
-
-body.dark-level-2 .container {
-    opacity: 0.2;
-}
-
-body.dark-level-2 .header,
-body.dark-level-2 .controls {
-    opacity: 0.05;
-}
-
-/* Keep dark toggle button visible in all dark modes */
-.dark-toggle {
-    opacity: 1 !important;
-    color: rgba(255, 255, 255, 0.8) !important;
-}
-
-body.dark-level-1 .dark-toggle,
-body.dark-level-2 .dark-toggle {
-    opacity: 1 !important;
-    color: rgba(255, 255, 255, 0.8) !important;
-}
 
 .container {
     text-align: center;
@@ -84,7 +56,7 @@ body.dark-level-2 .dark-toggle {
 .score {
     display: inline-block;
     padding: 5px 15px;
-    color: rgba(255, 255, 255, 0.95);
+    color: rgba(255, 255, 255, 0.3);
     font-weight: 200;
 }
 
@@ -237,19 +209,6 @@ body.dark-level-1 .tile-512 { color: rgba(255, 80, 40, 0.6); }
 body.dark-level-1 .tile-1024 { color: rgba(255, 60, 30, 0.65); }
 body.dark-level-1 .tile-2048 { color: rgba(255, 40, 20, 0.7); }
 
-body.dark-level-2 .tile-1 { color: rgba(255, 255, 255, 0.06); }
-body.dark-level-2 .tile-2 { color: rgba(255, 255, 255, 0.08); }
-body.dark-level-2 .tile-4 { color: rgba(255, 255, 200, 0.1); }
-body.dark-level-2 .tile-8 { color: rgba(255, 200, 150, 0.12); }
-body.dark-level-2 .tile-16 { color: rgba(255, 180, 120, 0.14); }
-body.dark-level-2 .tile-32 { color: rgba(255, 160, 100, 0.16); }
-body.dark-level-2 .tile-64 { color: rgba(255, 140, 80, 0.18); }
-body.dark-level-2 .tile-128 { color: rgba(255, 120, 60, 0.2); }
-body.dark-level-2 .tile-256 { color: rgba(255, 100, 50, 0.22); }
-body.dark-level-2 .tile-512 { color: rgba(255, 80, 40, 0.24); }
-body.dark-level-2 .tile-1024 { color: rgba(255, 60, 30, 0.26); }
-body.dark-level-2 .tile-2048 { color: rgba(255, 40, 20, 0.28); }
-
 .controls {
     margin-top: 20px;
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -291,101 +250,6 @@ button:focus {
     display: none;
 }
 
-/* Bright mode styles */
-body.bright-mode .score-container {
-    color: #776e65;
-    opacity: 1;
-}
-
-body.bright-mode .score {
-    color: #776e65;
-    font-weight: 400;
-}
-
-body.bright-mode button {
-    color: #776e65;
-    background: rgba(119, 110, 101, 0.1);
-}
-
-body.bright-mode button:hover {
-    color: #776e65;
-    background: rgba(119, 110, 101, 0.2);
-}
-
-body.bright-mode .game-grid {
-    background: #bbada0;
-    padding: 10px;
-    border-radius: 6px;
-}
-
-body.bright-mode .grid-cell {
-    background: rgba(238, 228, 218, 0.35);
-}
-
-body.bright-mode .tile-1 {
-    background: #f3f0eb;
-    color: #776e65;
-}
-
-body.bright-mode .tile-2 {
-    background: #eee4da;
-    color: #776e65;
-}
-
-body.bright-mode .tile-4 {
-    background: #ede0c8;
-    color: #776e65;
-}
-
-body.bright-mode .tile-8 {
-    background: #f2b179;
-    color: #f9f6f2;
-}
-
-body.bright-mode .tile-16 {
-    background: #f59563;
-    color: #f9f6f2;
-}
-
-body.bright-mode .tile-32 {
-    background: #f67c5f;
-    color: #f9f6f2;
-}
-
-body.bright-mode .tile-64 {
-    background: #f65e3b;
-    color: #f9f6f2;
-}
-
-body.bright-mode .tile-128 {
-    background: #edcf72;
-    color: #f9f6f2;
-    font-size: var(--font-size-small, 28px);
-}
-
-body.bright-mode .tile-256 {
-    background: #edcc61;
-    color: #f9f6f2;
-    font-size: var(--font-size-small, 28px);
-}
-
-body.bright-mode .tile-512 {
-    background: #edc850;
-    color: #f9f6f2;
-    font-size: var(--font-size-small, 28px);
-}
-
-body.bright-mode .tile-1024 {
-    background: #edc53f;
-    color: #f9f6f2;
-    font-size: var(--font-size-tiny, 24px);
-}
-
-body.bright-mode .tile-2048 {
-    background: #edc22e;
-    color: #f9f6f2;
-    font-size: var(--font-size-tiny, 24px);
-}
 
 /* Game over overlay */
 .game-over-overlay {
@@ -441,27 +305,4 @@ body.bright-mode .tile-2048 {
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Bright mode game over styles */
-body.bright-mode .game-over-overlay {
-    background: rgba(255, 255, 255, 0.9);
-}
-
-body.bright-mode .game-over-message h2 {
-    color: #776e65;
-}
-
-body.bright-mode .game-over-message .final-score {
-    color: #776e65;
-}
-
-body.bright-mode .new-game-overlay {
-    background: #8f7a66;
-    border: none;
-    color: #f9f6f2;
-}
-
-body.bright-mode .new-game-overlay:hover {
-    background: #9f8a76;
-    color: #f9f6f2;
-}
 

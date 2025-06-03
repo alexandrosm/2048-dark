@@ -180,9 +180,6 @@ class Game2048 {
             this.startNewGame();
         });
 
-        document.querySelector('.dark-toggle').addEventListener('click', () => {
-            this.toggleDarkMode();
-        });
 
         document.querySelector('.undo').addEventListener('click', () => {
             this.undo();
@@ -860,6 +857,8 @@ class Game2048 {
                     this.moveInProgress = false;
                     
                     if (this.isGameOver()) {
+                        // Reset undo usage when game ends to allow undo on game over screen
+                        this.undosUsedThisGame = 0;
                         setTimeout(() => {
                             this.showGameOver();
                         }, 300);
@@ -1419,7 +1418,7 @@ class Game2048 {
     }
     
     updateUndoButton() {
-        const undoButton = document.querySelector('button[onclick="game.undo()"]');
+        const undoButton = document.querySelector('.undo');
         if (!undoButton) return;
         
         const undoLevel = parseInt(localStorage.getItem('2048-undo-levels') || '1');
@@ -1430,7 +1429,7 @@ class Game2048 {
             isDisabled = true;
         } else if (undoLevel === 0) {
             isDisabled = true;
-        } else if (undoLevel === 1 && this.undosUsedThisGame >= 1) {
+        } else if (undoLevel === 1 && this.undosUsedThisGame >= 1 && !this.isGameOver()) {
             isDisabled = true;
         }
         
