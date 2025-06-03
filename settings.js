@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('2048-dev-mode', enabled ? 'true' : 'false');
         
         if (enabled) {
-            alert('Dev mode enabled! The app will check for updates every 30 seconds and auto-reload when a new version is deployed.');
+            alert('Developer Mode enabled! 🚀\n\nYou\'ll automatically get the latest version whenever updates are deployed. The app will check every 30 seconds and reload seamlessly when a new version is available.\n\nLook for the small DEV indicator in the top-right corner.');
         }
     });
 });
