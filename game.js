@@ -804,17 +804,7 @@ class Game2048 {
         for (let row = 0; row < this.size; row++) {
             for (let col = 0; col < this.size; col++) {
                 if (this.grid[row][col] === 0) {
-                    // Check if any tile is still occupying this position (including tiles marked for removal)
-                    let occupied = false;
-                    this.tiles.forEach(tile => {
-                        if (tile.row === row && tile.col === col && !tile.toBeRemoved) {
-                            occupied = true;
-                        }
-                    });
-                    
-                    if (!occupied) {
-                        emptyCells.push({row, col});
-                    }
+                    emptyCells.push({row, col});
                 }
             }
         }
@@ -926,15 +916,17 @@ class Game2048 {
                 setTimeout(() => {
                     this.addNewTile();
                     this.saveGameState();
-                    this.moveInProgress = false;
                     
-                    if (this.isGameOver()) {
+                    // Check for game over AFTER adding new tile
+                    if (this.checkGameOver()) {
                         // Reset undo usage when game ends to allow undo on game over screen
                         this.undosUsedThisGame = 0;
                         setTimeout(() => {
                             this.showGameOver();
                         }, 300);
                     }
+                    
+                    this.moveInProgress = false;
                 }, 50);
             }, animationSpeed);
         } else {
@@ -976,8 +968,15 @@ class Game2048 {
                     tile.value *= 2;
                     tile.element.textContent = tile.value;
                     tile.element.className = `tile tile-${tile.value}`;
-                    mergedWith.element.remove();
+                    
+                    // Remove the merged tile and update grid
+                    if (mergedWith.element) {
+                        mergedWith.element.remove();
+                    }
                     this.tiles.delete(mergedWith.id);
+                    
+                    // Update grid to reflect the new tile value
+                    this.grid[tile.row][tile.col] = tile.value;
                 }, animationSpeed);
             }
         });
@@ -1258,6 +1257,36 @@ class Game2048 {
         }
         return true;
     }
+    
+    checkGameOver() {
+        // First check if we can spawn a new tile
+        const emptyCells = [];
+        for (let row = 0; row < this.size; row++) {
+            for (let col = 0; col < this.size; col++) {
+                if (this.grid[row][col] === 0) {
+                    emptyCells.push({row, col});
+                }
+            }
+        }
+        
+        // If there are empty cells, game is not over
+        if (emptyCells.length > 0) return false;
+        
+        // No empty cells - check if any moves are possible
+        for (let row = 0; row < this.size; row++) {
+            for (let col = 0; col < this.size; col++) {
+                const value = this.grid[row][col];
+                
+                // Check right
+                if (col < this.size - 1 && value === this.grid[row][col + 1]) return false;
+                
+                // Check down
+                if (row < this.size - 1 && value === this.grid[row + 1][col]) return false;
+            }
+        }
+        
+        return true;
+    }
 
     updateScore() {
         // Update high score if current score is higher
@@ -1456,8 +1485,8 @@ class Game2048 {
         // If no undos allowed
         if (undoLevel === 0) return;
         
-        // If single undo only and already used
-        if (undoLevel === 1 && this.undosUsedThisGame >= 1) return;
+        // If single undo only and already used (unless game is over)
+        if (undoLevel === 1 && this.undosUsedThisGame >= 1 && !this.checkGameOver()) return;
         
         this.undoCount++;
         this.undosUsedThisGame++;
@@ -1507,7 +1536,7 @@ class Game2048 {
             isDisabled = true;
         } else if (undoLevel === 0) {
             isDisabled = true;
-        } else if (undoLevel === 1 && this.undosUsedThisGame >= 1 && !this.isGameOver()) {
+        } else if (undoLevel === 1 && this.undosUsedThisGame >= 1 && !this.checkGameOver()) {
             isDisabled = true;
         }
         
