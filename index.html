@@ -16,6 +16,59 @@
     <link rel="alternate icon" href="/favicon.ico">
     
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER_ID"></script>
+    <script>
+        // Check if analytics are enabled and DNT is not set
+        if (localStorage.getItem('2048-analytics-enabled') !== 'false' && 
+            navigator.doNotTrack !== '1' && 
+            window.doNotTrack !== '1' && 
+            navigator.msDoNotTrack !== '1') {
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-PLACEHOLDER_ID', {
+                anonymize_ip: true,
+                cookie_flags: 'SameSite=None;Secure'
+            });
+        }
+    </script>
+    
+    <!-- Sentry Error Tracking -->
+    <script
+        src="https://browser.sentry-cdn.com/7.89.0/bundle.tracing.min.js"
+        crossorigin="anonymous"
+    ></script>
+    <script>
+        // Initialize Sentry if error tracking is enabled
+        if (localStorage.getItem('2048-error-tracking-enabled') !== 'false') {
+            Sentry.init({
+                dsn: "https://YOUR_SENTRY_DSN@sentry.io/PROJECT_ID",
+                integrations: [
+                    new Sentry.BrowserTracing(),
+                ],
+                tracesSampleRate: 0.1,
+                environment: window.location.hostname === 'localhost' ? 'development' : 'production',
+                beforeSend: function(event, hint) {
+                    // Filter out non-application errors
+                    if (event.exception && event.exception.values && event.exception.values[0]) {
+                        const error = event.exception.values[0];
+                        // Only send errors from our own code
+                        if (error.stacktrace && error.stacktrace.frames) {
+                            const hasOurCode = error.stacktrace.frames.some(frame => 
+                                frame.filename && (frame.filename.includes('game.js') || 
+                                frame.filename.includes('settings.js') ||
+                                frame.filename.includes('sw.js'))
+                            );
+                            if (!hasOurCode) return null;
+                        }
+                    }
+                    return event;
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container">

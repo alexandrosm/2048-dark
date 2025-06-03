@@ -307,4 +307,38 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
+    
+    // Privacy Settings
+    const analyticsToggle = document.getElementById('analytics-toggle');
+    const errorTrackingToggle = document.getElementById('error-tracking-toggle');
+    
+    // Load privacy settings
+    analyticsToggle.checked = localStorage.getItem('2048-analytics-enabled') !== 'false';
+    errorTrackingToggle.checked = localStorage.getItem('2048-error-tracking-enabled') !== 'false';
+    
+    // Save analytics preference
+    analyticsToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('2048-analytics-enabled', enabled ? 'true' : 'false');
+        
+        // If disabling analytics, send opt-out event
+        if (!enabled && typeof gtag !== 'undefined') {
+            gtag('config', 'G-PLACEHOLDER_ID', {
+                'anonymize_ip': true,
+                'cookie_flags': 'SameSite=None;Secure',
+                'send_page_view': false
+            });
+        }
+    });
+    
+    // Save error tracking preference
+    errorTrackingToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('2048-error-tracking-enabled', enabled ? 'true' : 'false');
+        
+        // If disabling Sentry, clear user context
+        if (!enabled && typeof Sentry !== 'undefined') {
+            Sentry.configureScope(scope => scope.clear());
+        }
+    });
 });

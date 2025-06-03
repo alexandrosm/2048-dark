@@ -1,5 +1,25 @@
 class Game2048 {
     constructor() {
+        // Track analytics event helper
+        this.trackEvent = (action, category = 'game', label = null, value = null) => {
+            if (typeof gtag !== 'undefined' && localStorage.getItem('2048-analytics-enabled') !== 'false') {
+                gtag('event', action, {
+                    event_category: category,
+                    event_label: label,
+                    value: value
+                });
+            }
+        };
+        
+        // Track errors with Sentry
+        this.trackError = (error, context = {}) => {
+            console.error(error);
+            if (typeof Sentry !== 'undefined' && localStorage.getItem('2048-error-tracking-enabled') !== 'false') {
+                Sentry.captureException(error, {
+                    extra: context
+                });
+            }
+        };
         this.grid = [];
         this.score = 0;
         this.size = 4;
@@ -69,6 +89,117 @@ class Game2048 {
                 this.updateUndoButton();
             }
         }
+    }
+    
+    // Analytics helper methods
+    sendAnalytics(eventName, parameters = {}) {
+        // Check if analytics are enabled and gtag is available
+        if (localStorage.getItem('2048-analytics-enabled') !== 'false' && 
+            typeof gtag !== 'undefined' &&
+            navigator.doNotTrack !== '1' && 
+            window.doNotTrack !== '1' && 
+            navigator.msDoNotTrack !== '1') {
+            try {
+                gtag('event', eventName, {
+                    game_score: this.score,
+                    high_score: this.highScore,
+                    dark_mode: this.darkMode,
+                    ...parameters
+                });
+            } catch (e) {
+                console.error('Analytics error:', e);
+            }
+        }
+    }
+    
+    trackError(error, context = {}) {
+        // Check if error tracking is enabled and Sentry is available
+        if (localStorage.getItem('2048-error-tracking-enabled') !== 'false' && 
+            typeof Sentry !== 'undefined') {
+            try {
+                Sentry.captureException(error, {
+                    tags: {
+                        game_score: this.score,
+                        dark_mode: this.darkMode
+                    },
+                    extra: {
+                        ...context,
+                        game_state: {
+                            grid: this.grid,
+                            tiles: this.tiles.size,
+                            moves: this.history.length
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Error tracking failed:', e);
+            }
+        }
+        
+        // Also log to game history for debugging
+        if (this.gameHistory) {
+            this.gameHistory.errors.push({
+                timestamp: new Date().toISOString(),
+                error: error.message || error.toString(),
+                stack: error.stack,
+                context
+            });
+        }
+    }
+    
+    logEvent(eventType, data = {}) {
+        // Add to game history for debugging
+        if (this.gameHistory) {
+            this.gameHistory.events.push({
+                timestamp: new Date().toISOString(),
+                type: eventType,
+                data
+            });
+        }
+        
+        // Send analytics event
+        this.sendAnalytics(eventType, data);
+    }
+    
+    logMove(direction, previousScore, newScore, movements, duration) {
+        const moveData = {
+            direction,
+            previousScore,
+            newScore,
+            scoreGained: newScore - previousScore,
+            tilesMovedCount: movements.length,
+            mergeCount: movements.filter(m => m.merged).length,
+            duration,
+            undosUsed: this.undosUsedThisGame
+        };
+        
+        // Add to game history
+        if (this.gameHistory) {
+            this.gameHistory.moves.push({
+                timestamp: new Date().toISOString(),
+                ...moveData
+            });
+        }
+        
+        // Send analytics
+        this.sendAnalytics('game_move', moveData);
+    }
+    
+    generateGameId() {
+        return `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    }
+    
+    captureCurrentSettings() {
+        return {
+            darkMode: this.darkMode,
+            dragMultiplier: this.dragMultiplier,
+            animationSpeed: localStorage.getItem('2048-animation-speed') || '50',
+            moveCooldown: localStorage.getItem('2048-move-cooldown') || '0',
+            startWithOnes: localStorage.getItem('2048-start-with-ones') === 'true',
+            luckyEights: localStorage.getItem('2048-lucky-eights') === 'true',
+            undoLevels: localStorage.getItem('2048-undo-levels') || '1',
+            zoomLevel: this.zoomLevel
+        };
     }
     
     setupResponsiveSizing() {
@@ -804,6 +935,9 @@ class Game2048 {
         if (this.score > 0) {
             this.saveCompletedGame();
             this.saveGameHistory(); // Save debug history
+            
+            // Track game completion
+            this.trackEvent('game_complete', 'game', null, this.score);
         }
         
         // Reset game history for new game
@@ -819,7 +953,11 @@ class Game2048 {
             settings: this.captureCurrentSettings()
         };
         
-        this.logEvent('game_started', { reason: 'new_game_button' });
+        this.logEvent('game_started', { 
+            reason: 'new_game_button',
+            previous_score: this.score,
+            undos_used: this.undosUsedThisGame
+        });
         
         this.grid = Array(this.size).fill().map(() => Array(this.size).fill(0));
         this.score = 0;
@@ -838,6 +976,9 @@ class Game2048 {
         
         // Update undo button state
         this.updateUndoButton();
+        
+        // Track new game start
+        this.trackEvent('game_start', 'game');
     }
 
     createTileElement(value, row, col) {
@@ -1454,6 +1595,9 @@ class Game2048 {
         
         // Save the completed game
         this.saveCompletedGame();
+        
+        // Track game over
+        this.trackEvent('game_over', 'game', null, this.score);
     }
     
     hideGameOver() {
@@ -1525,13 +1669,26 @@ class Game2048 {
     }
     
     saveCompletedGame() {
-        const games = this.loadGameHistory();
-        games.push({
+        const gameData = {
             score: this.score,
             timestamp: new Date().toISOString(),
             moves: this.history.length,
-            undos: this.undoCount
+            undos: this.undoCount,
+            duration: this.gameHistory ? 
+                (new Date() - new Date(this.gameHistory.startTime)) / 1000 : 0
+        };
+        
+        // Send analytics for completed game
+        this.sendAnalytics('game_completed', {
+            final_score: gameData.score,
+            total_moves: gameData.moves,
+            total_undos: gameData.undos,
+            game_duration_seconds: gameData.duration,
+            highest_tile: Math.max(...Array.from(this.tiles.values()).map(t => t.value))
         });
+        
+        const games = this.loadGameHistory();
+        games.push(gameData);
         localStorage.setItem('2048-games', JSON.stringify(games));
     }
     
@@ -1802,15 +1959,40 @@ if (document.readyState === 'loading') {
     }
 }
 
+// Global error handlers
+window.addEventListener('error', (event) => {
+    if (window.game && typeof window.game.trackError === 'function') {
+        window.game.trackError(event.error || new Error(event.message), {
+            filename: event.filename,
+            lineno: event.lineno,
+            colno: event.colno
+        });
+    }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+    if (window.game && typeof window.game.trackError === 'function') {
+        window.game.trackError(new Error(`Unhandled promise rejection: ${event.reason}`), {
+            promise: event.promise
+        });
+    }
+});
+
 // PWA Support
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js')
             .then(registration => {
                 // ServiceWorker registration successful
+                if (window.game && typeof window.game.logEvent === 'function') {
+                    window.game.logEvent('service_worker_registered');
+                }
             })
             .catch(err => {
                 // ServiceWorker registration failed
+                if (window.game && typeof window.game.trackError === 'function') {
+                    window.game.trackError(err, { context: 'service_worker_registration' });
+                }
             });
     });
 }
