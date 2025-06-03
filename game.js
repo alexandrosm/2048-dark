@@ -1109,9 +1109,6 @@ class Game2048 {
         // Reset merged state for all tiles
         this.tiles.forEach(tile => tile.merged = false);
         
-        // Log move attempt
-        const moveStartTime = Date.now();
-        
         switch(direction) {
             case 'left':
                 movements.push(...this.moveLeft());
@@ -1129,7 +1126,7 @@ class Game2048 {
 
         if (JSON.stringify(this.grid) !== previousGrid) {
             // Log successful move
-            this.logMove(direction, previousScore, this.score, movements, Date.now() - moveStartTime);
+            this.logMove(direction, previousScore, this.score, movements, performance.now() - moveStartTime);
             // Check if this move is the same as the last undone move
             if (this.lastUndoneDirection === direction && this.undosUsedThisGame > 0) {
                 // User is redoing the same move they just undid, restore their undo
