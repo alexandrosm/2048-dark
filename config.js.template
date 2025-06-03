@@ -1,0 +1,19 @@
+// Analytics Configuration
+// Copy this file to config.js and add your actual IDs
+// config.js is gitignored and won't be committed
+
+window.ANALYTICS_CONFIG = {
+    // Google Analytics 4 Measurement ID
+    // Get this from Google Analytics > Admin > Data Streams
+    GA4_ID: 'G-PLACEHOLDER_ID',
+    
+    // Sentry DSN
+    // Get this from Sentry > Project Settings > Client Keys (DSN)
+    SENTRY_DSN: '',
+    
+    // Optional: Enable analytics debug mode
+    GA4_DEBUG_MODE: false,
+    
+    // Optional: Enable Sentry in development
+    SENTRY_TRACE_RATE: 0.1
+};

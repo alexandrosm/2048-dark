@@ -1,0 +1,8 @@
+// Example configuration file with placeholder values
+// This file can be committed to show the structure
+// Copy to config.js and add your actual values
+
+window.ANALYTICS_CONFIG = {
+    GA4_ID: 'G-PLACEHOLDER_ID',
+    SENTRY_DSN: 'https://YOUR_SENTRY_DSN@sentry.io/PROJECT_ID'
+};

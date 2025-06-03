@@ -17,20 +17,33 @@
     
     <link rel="stylesheet" href="style.css">
     
+    <!-- Load configuration (optional) -->
+    <script src="config.js" onerror="console.log('No config.js found, using defaults')"></script>
+    
     <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-PLACEHOLDER_ID"></script>
     <script>
-        // Check if analytics are enabled and DNT is not set
-        if (localStorage.getItem('2048-analytics-enabled') !== 'false' && 
+        // Load GA4 script only if config exists
+        if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.GA4_ID && window.ANALYTICS_CONFIG.GA4_ID !== 'G-PLACEHOLDER_ID') {
+            const script = document.createElement('script');
+            script.async = true;
+            script.src = 'https://www.googletagmanager.com/gtag/js?id=' + window.ANALYTICS_CONFIG.GA4_ID;
+            document.head.appendChild(script);
+        }
+    </script>
+    <script>
+        // Initialize Google Analytics if configured and enabled
+        if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.GA4_ID && window.ANALYTICS_CONFIG.GA4_ID !== 'G-PLACEHOLDER_ID' &&
+            localStorage.getItem('2048-analytics-enabled') !== 'false' && 
             navigator.doNotTrack !== '1' && 
             window.doNotTrack !== '1' && 
             navigator.msDoNotTrack !== '1') {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-PLACEHOLDER_ID', {
+            gtag('config', window.ANALYTICS_CONFIG.GA4_ID, {
                 anonymize_ip: true,
-                cookie_flags: 'SameSite=None;Secure'
+                cookie_flags: 'SameSite=None;Secure',
+                debug_mode: window.ANALYTICS_CONFIG.GA4_DEBUG_MODE || false
             });
         }
     </script>
@@ -41,14 +54,17 @@
         crossorigin="anonymous"
     ></script>
     <script>
-        // Initialize Sentry if error tracking is enabled
-        if (localStorage.getItem('2048-error-tracking-enabled') !== 'false') {
+        // Initialize Sentry if configured and error tracking is enabled
+        if (window.ANALYTICS_CONFIG && window.ANALYTICS_CONFIG.SENTRY_DSN && 
+            !window.ANALYTICS_CONFIG.SENTRY_DSN.includes('YOUR_SENTRY_DSN') &&
+            localStorage.getItem('2048-error-tracking-enabled') !== 'false' && 
+            typeof Sentry !== 'undefined') {
             Sentry.init({
-                dsn: "https://YOUR_SENTRY_DSN@sentry.io/PROJECT_ID",
+                dsn: window.ANALYTICS_CONFIG.SENTRY_DSN,
                 integrations: [
                     new Sentry.BrowserTracing(),
                 ],
-                tracesSampleRate: 0.1,
+                tracesSampleRate: window.ANALYTICS_CONFIG.SENTRY_SAMPLE_RATE || 0.1,
                 environment: window.location.hostname === 'localhost' ? 'development' : 'production',
                 beforeSend: function(event, hint) {
                     // Filter out non-application errors

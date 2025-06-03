@@ -22,3 +22,6 @@ index.dev.html
 # OS files
 Thumbs.db
 desktop.ini
+
+# Configuration files with secrets
+config.js
