@@ -70,6 +70,12 @@ class Game2048 {
         // Send pageview event after initialization
         setTimeout(() => {
             this.trackEvent('page_view', 'navigation', window.location.pathname);
+            
+            // Test Sentry error (remove this after testing)
+            if (window.location.search.includes('test-sentry')) {
+                console.log('Testing Sentry error tracking...');
+                throw new Error('Test error for Sentry verification');
+            }
         }, 1000);
     }
 
