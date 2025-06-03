@@ -172,6 +172,7 @@ class Analytics {
         
         // Draw undo line
         if (this.games.length > 1) {
+            const undoColor = isBrightMode ? '143, 122, 102' : '255, 107, 0';
             this.ctx.strokeStyle = `rgba(${undoColor}, ${0.2 * opacityMultiplier})`;
             this.ctx.lineWidth = 1;
             this.ctx.setLineDash([5, 5]);

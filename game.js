@@ -10,7 +10,7 @@ class Game2048 {
         this.dragStartX = 0;
         this.dragStartY = 0;
         this.dragThreshold = 50;
-        this.dragMultiplier = parseFloat(localStorage.getItem('2048-multiplier') || '3.5');
+        this.dragMultiplier = parseFloat(localStorage.getItem('2048-multiplier') || '6');
         this.previewPositions = new Map();
         this.history = [];
         this.lastExecutedDirection = null;
@@ -23,6 +23,7 @@ class Game2048 {
         this.cellSize = 70; // Default value
         this.gapSize = 12; // Default value
         this.undosUsedThisGame = 0; // Track undos used in current game
+        this.lastUndoneDirection = null; // Track the direction of the last undone move
         this.init();
     }
 
@@ -527,7 +528,7 @@ class Game2048 {
         
         // After move completes, reset for next potential move
         if (this.isDragging && currentX !== undefined && currentY !== undefined) {
-            const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
+            const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '50');
             setTimeout(() => {
                 // Update drag start position for continuous dragging
                 this.dragStartX = currentX;
@@ -809,7 +810,7 @@ class Game2048 {
         if (this.moveInProgress) return;
         
         // Check move cooldown
-        const cooldown = parseInt(localStorage.getItem('2048-move-cooldown') || '50');
+        const cooldown = parseInt(localStorage.getItem('2048-move-cooldown') || '0');
         if (cooldown > 0) {
             const now = Date.now();
             const timeSinceLastMove = now - this.lastMoveTime;
@@ -827,6 +828,7 @@ class Game2048 {
         this.previewPositions.clear();
         
         // Save state before move
+        this.lastExecutedDirection = direction; // Set the direction before saving state
         this.saveState();
         
         // Reset merged state for all tiles
@@ -848,9 +850,17 @@ class Game2048 {
         }
 
         if (JSON.stringify(this.grid) !== previousGrid) {
+            // Check if this move is the same as the last undone move
+            if (this.lastUndoneDirection === direction && this.undosUsedThisGame > 0) {
+                // User is redoing the same move they just undid, restore their undo
+                this.undosUsedThisGame--;
+                this.updateUndoButton();
+            }
+            this.lastUndoneDirection = null; // Clear the last undone direction
+            
             this.animateMovements(movements);
             
-            const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
+            const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '50');
             setTimeout(() => {
                 this.cleanupMergedTiles();
                 
@@ -877,7 +887,7 @@ class Game2048 {
     }
 
     animateMovements(movements) {
-        const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '150');
+        const animationSpeed = parseInt(localStorage.getItem('2048-animation-speed') || '50');
         const animationSeconds = animationSpeed / 1000;
         
         movements.forEach(({tile, newRow, newCol, merged, mergedWith}) => {
@@ -1359,7 +1369,8 @@ class Game2048 {
         const state = {
             grid: JSON.parse(JSON.stringify(this.grid)),
             score: this.score,
-            tiles: []
+            tiles: [],
+            lastDirection: this.lastExecutedDirection // Save the direction of this move
         };
         
         // Save tile positions and values
@@ -1393,6 +1404,10 @@ class Game2048 {
         this.undoCount++;
         this.undosUsedThisGame++;
         const state = this.history.pop();
+        
+        // Store the direction of the move we're undoing
+        this.lastUndoneDirection = state.lastDirection;
+        
         this.grid = state.grid;
         this.score = state.score;
         
