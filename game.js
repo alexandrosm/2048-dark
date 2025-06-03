@@ -416,18 +416,18 @@ class Game2048 {
         let isReloading = false;
         
         // Check if we just reloaded for an update
-        const lastReloadVersion = sessionStorage.getItem('2048-dev-reload-version');
-        if (lastReloadVersion === currentVersion) {
-            // We just reloaded but still have the same version, wait longer before checking
-            setTimeout(() => {
-                sessionStorage.removeItem('2048-dev-reload-version');
-            }, 60000); // Wait 1 minute before allowing another reload
+        const lastReloadAttempt = sessionStorage.getItem('2048-dev-reload-attempt');
+        const lastTargetVersion = sessionStorage.getItem('2048-dev-target-version');
+        
+        if (lastReloadAttempt && Date.now() - parseInt(lastReloadAttempt) < 60000) {
+            // We attempted a reload less than 1 minute ago, skip checks
+            return;
         }
         
         // Function to check for new version
         const checkForUpdate = async () => {
-            if (isReloading || sessionStorage.getItem('2048-dev-reload-version')) {
-                return; // Skip if already reloading or just reloaded
+            if (isReloading) {
+                return; // Skip if already reloading
             }
             
             try {
@@ -451,15 +451,22 @@ class Game2048 {
                     if (versionMatch) {
                         const remoteVersion = versionMatch[1];
                         
-                        if (remoteVersion !== currentVersion && remoteVersion !== lastReloadVersion) {
+                        // Check if this is the same version we already tried to reload for
+                        if (remoteVersion === lastTargetVersion) {
+                            // We already tried to reload for this version, don't try again
+                            return;
+                        }
+                        
+                        if (remoteVersion !== currentVersion) {
                             console.log(`New version available: ${remoteVersion} (current: ${currentVersion})`);
                             
                             // Prevent multiple reloads
                             isReloading = true;
                             clearInterval(checkInterval);
                             
-                            // Store version we're reloading for
-                            sessionStorage.setItem('2048-dev-reload-version', currentVersion);
+                            // Store the version we're trying to get and the attempt time
+                            sessionStorage.setItem('2048-dev-target-version', remoteVersion);
+                            sessionStorage.setItem('2048-dev-reload-attempt', Date.now().toString());
                             
                             // Show notification before reload
                             const notification = document.createElement('div');
@@ -480,6 +487,7 @@ class Game2048 {
                             notification.innerHTML = `
                                 <div>New version ${remoteVersion} available!</div>
                                 <div style="font-size: 14px; margin-top: 10px;">Reloading in 3 seconds...</div>
+                                <div style="font-size: 12px; margin-top: 5px; opacity: 0.8;">If reload fails, try manual refresh (Ctrl+Shift+R)</div>
                             `;
                             document.body.appendChild(notification);
                             
@@ -507,8 +515,17 @@ class Game2048 {
             }
         };
         
-        // Check immediately
-        checkForUpdate();
+        // Add a way to clear stuck reload state
+        window.clearDevModeReloadState = () => {
+            sessionStorage.removeItem('2048-dev-target-version');
+            sessionStorage.removeItem('2048-dev-reload-attempt');
+            console.log('Dev mode reload state cleared');
+        };
+        
+        // Check immediately unless we just tried
+        if (!lastReloadAttempt || Date.now() - parseInt(lastReloadAttempt) > 60000) {
+            checkForUpdate();
+        }
         
         // Then check every 30 seconds
         checkInterval = setInterval(checkForUpdate, 30000);
