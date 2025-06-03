@@ -27,6 +27,7 @@ class Game2048 {
         this.zoomLevel = parseFloat(localStorage.getItem('2048-zoom') || '1'); // Zoom level
         this.pinchStartDistance = 0; // For pinch gesture tracking
         this.isPinching = false; // Track if we're in a pinch gesture
+        this.isTwoFingerSwiping = false; // Track if we're in a two-finger swipe
         this.init();
     }
 
@@ -249,7 +250,7 @@ class Game2048 {
             // Check for two-finger touch
             if (e.touches.length === 2) {
                 this.isDragging = false; // Disable tile dragging
-                this.isPinching = true;
+                // Don't set isPinching yet - we'll determine gesture type on move
                 
                 // Calculate initial distance between touches for pinch
                 const dx = e.touches[0].clientX - e.touches[1].clientX;
@@ -304,26 +305,37 @@ class Game2048 {
                     this.resetToInitialPositions();
                 }
                 
-                if (this.isPinching && this.pinchStartDistance > 0) {
-                    // Calculate current distance between touches
-                    const dx = e.touches[0].clientX - e.touches[1].clientX;
-                    const dy = e.touches[0].clientY - e.touches[1].clientY;
-                    const currentDistance = Math.sqrt(dx * dx + dy * dy);
+                // Calculate current distance and position
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                const currentDistance = Math.sqrt(dx * dx + dy * dy);
+                const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                
+                // Determine gesture type if not yet determined
+                if (!this.isPinching && !this.isTwoFingerSwiping) {
+                    const distanceChange = Math.abs(currentDistance - this.pinchStartDistance);
+                    const verticalChange = Math.abs(currentY - twoFingerStartY);
                     
-                    // Calculate scale factor
+                    // If distance change is significant, it's a pinch
+                    if (distanceChange > 10) {
+                        this.isPinching = true;
+                    }
+                    // If vertical movement is significant, it's a swipe
+                    else if (verticalChange > 10) {
+                        this.isTwoFingerSwiping = true;
+                    }
+                }
+                
+                if (this.isPinching) {
+                    // Handle pinch zoom
                     const scale = currentDistance / this.pinchStartDistance;
-                    
-                    // Apply scale to zoom level
                     const newZoom = this.zoomLevel * scale;
                     this.setZoomLevel(newZoom);
-                    
-                    // Update start distance for continuous pinching
                     this.pinchStartDistance = currentDistance;
-                } else {
+                } else if (this.isTwoFingerSwiping) {
                     // Handle two-finger swipe for menu
                     const twoFingerMenuEnabled = localStorage.getItem('2048-two-finger-menu') !== 'false';
                     if (twoFingerMenuEnabled) {
-                        const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
                         const deltaY = currentY - twoFingerStartY;
                         
                         if (Math.abs(deltaY) > 50) { // Threshold for swipe
@@ -416,9 +428,10 @@ class Game2048 {
         }, { passive: false });
 
         document.addEventListener('touchend', (e) => {
-            // Reset pinching state
-            if (this.isPinching) {
+            // Reset two-finger gesture states
+            if (this.isPinching || this.isTwoFingerSwiping) {
                 this.isPinching = false;
+                this.isTwoFingerSwiping = false;
                 this.pinchStartDistance = 0;
             }
             
