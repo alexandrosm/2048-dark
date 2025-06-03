@@ -1803,17 +1803,6 @@ class Game2048 {
             undoButton.style.cursor = 'pointer';
         }
     }
-}
-
-// Wait for DOM to be ready before initializing the game
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        window.game = new Game2048();
-    });
-} else {
-    // DOM is already ready
-    window.game = new Game2048();
-}
 
     // Game history tracking methods
     generateGameId() {
@@ -1957,6 +1946,16 @@ if (document.readyState === 'loading') {
         
         return history;
     }
+}
+
+// Wait for DOM to be ready before initializing the game
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        window.game = new Game2048();
+    });
+} else {
+    // DOM is already ready
+    window.game = new Game2048();
 }
 
 // Global error handlers
