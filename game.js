@@ -27,8 +27,8 @@ class Game2048 {
     }
 
     init() {
-        // Apply saved dark mode
-        document.body.className = this.darkMode === 3 ? 'bright-mode' : `dark-level-${this.darkMode}`;
+        // Apply saved dark mode (only levels 0 and 1)
+        document.body.className = `dark-level-${this.darkMode}`;
         
         this.setupResponsiveSizing();
         this.setupGrid();
@@ -183,6 +183,10 @@ class Game2048 {
 
         document.querySelector('.undo').addEventListener('click', () => {
             this.undo();
+        });
+        
+        document.querySelector('.dark-mode').addEventListener('click', () => {
+            this.toggleDarkMode();
         });
         
         document.querySelector('.settings').addEventListener('click', () => {
@@ -1206,8 +1210,9 @@ class Game2048 {
     }
 
     toggleDarkMode() {
-        this.darkMode = (this.darkMode + 1) % 4;
-        document.body.className = this.darkMode === 3 ? 'bright-mode' : `dark-level-${this.darkMode}`;
+        // Toggle between dark levels 0 and 1 only
+        this.darkMode = (this.darkMode + 1) % 2;
+        document.body.className = `dark-level-${this.darkMode}`;
         localStorage.setItem('2048-darkmode', this.darkMode.toString());
     }
     
