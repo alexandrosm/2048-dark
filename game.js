@@ -24,6 +24,9 @@ class Game2048 {
         this.gapSize = 12; // Default value
         this.undosUsedThisGame = 0; // Track undos used in current game
         this.lastUndoneDirection = null; // Track the direction of the last undone move
+        this.zoomLevel = parseFloat(localStorage.getItem('2048-zoom') || '1'); // Zoom level
+        this.pinchStartDistance = 0; // For pinch gesture tracking
+        this.isPinching = false; // Track if we're in a pinch gesture
         this.init();
     }
 
@@ -65,10 +68,10 @@ class Game2048 {
             const cellSize = Math.floor(maxBoardSize / (cellCount + totalGapRatio));
             const gapSize = Math.floor(cellSize * gapRatio);
             
-            // Calculate font sizes
-            const fontSize = Math.floor(cellSize * 0.45);
-            const fontSizeSmall = Math.floor(cellSize * 0.4);
-            const fontSizeTiny = Math.floor(cellSize * 0.35);
+            // Calculate font sizes with zoom level applied
+            const fontSize = Math.floor(cellSize * 0.45 * this.zoomLevel);
+            const fontSizeSmall = Math.floor(cellSize * 0.4 * this.zoomLevel);
+            const fontSizeTiny = Math.floor(cellSize * 0.35 * this.zoomLevel);
             
             // Set CSS variables
             document.documentElement.style.setProperty('--cell-size', `${cellSize}px`);
@@ -98,6 +101,17 @@ class Game2048 {
     
     getTileOffset(position) {
         return position * (this.cellSize + this.gapSize);
+    }
+    
+    setZoomLevel(zoom) {
+        // Clamp zoom between 0.5 and 2.0
+        this.zoomLevel = Math.max(0.5, Math.min(2.0, zoom));
+        
+        // Save to localStorage
+        localStorage.setItem('2048-zoom', this.zoomLevel.toString());
+        
+        // Reapply sizing with new zoom level
+        this.setupResponsiveSizing();
     }
     
     updateAllTilePositions() {
@@ -202,6 +216,18 @@ class Game2048 {
             this.hideGameOver();
             this.startNewGame();
         });
+        
+        // Add wheel event listener for touchpad pinch (ctrl+wheel)
+        document.addEventListener('wheel', (e) => {
+            if (e.ctrlKey) {
+                e.preventDefault();
+                
+                // Calculate zoom change based on wheel delta
+                const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1; // Zoom out or in
+                const newZoom = this.zoomLevel * zoomDelta;
+                this.setZoomLevel(newZoom);
+            }
+        }, { passive: false });
 
         // Touch event handling with real-time preview on whole screen
         
@@ -216,6 +242,14 @@ class Game2048 {
             // Check for two-finger touch
             if (e.touches.length === 2) {
                 this.isDragging = false; // Disable tile dragging
+                this.isPinching = true;
+                
+                // Calculate initial distance between touches for pinch
+                const dx = e.touches[0].clientX - e.touches[1].clientX;
+                const dy = e.touches[0].clientY - e.touches[1].clientY;
+                this.pinchStartDistance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Also track for two-finger swipe
                 twoFingerStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
                 return;
             }
@@ -254,7 +288,7 @@ class Game2048 {
         }, { passive: false });
 
         document.addEventListener('touchmove', (e) => {
-            // Handle two-finger swipe
+            // Handle two-finger gestures
             if (e.touches.length === 2) {
                 // If we were dragging, reset tile positions
                 if (this.isDragging) {
@@ -262,18 +296,36 @@ class Game2048 {
                     this.resetToInitialPositions();
                 }
                 
-                const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                const deltaY = currentY - twoFingerStartY;
-                
-                if (Math.abs(deltaY) > 50) { // Threshold for swipe
-                    if (deltaY > 0) {
-                        // Swipe down - hide menu
-                        this.toggleMenu(false);
-                    } else {
-                        // Swipe up - show menu
-                        this.toggleMenu(true);
+                if (this.isPinching && this.pinchStartDistance > 0) {
+                    // Calculate current distance between touches
+                    const dx = e.touches[0].clientX - e.touches[1].clientX;
+                    const dy = e.touches[0].clientY - e.touches[1].clientY;
+                    const currentDistance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    // Calculate scale factor
+                    const scale = currentDistance / this.pinchStartDistance;
+                    
+                    // Apply scale to zoom level
+                    const newZoom = this.zoomLevel * scale;
+                    this.setZoomLevel(newZoom);
+                    
+                    // Update start distance for continuous pinching
+                    this.pinchStartDistance = currentDistance;
+                } else {
+                    // Handle two-finger swipe for menu
+                    const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                    const deltaY = currentY - twoFingerStartY;
+                    
+                    if (Math.abs(deltaY) > 50) { // Threshold for swipe
+                        if (deltaY > 0) {
+                            // Swipe down - hide menu
+                            this.toggleMenu(false);
+                        } else {
+                            // Swipe up - show menu
+                            this.toggleMenu(true);
+                        }
+                        twoFingerStartY = currentY; // Reset for continuous swipes
                     }
-                    twoFingerStartY = currentY; // Reset for continuous swipes
                 }
                 return;
             }
@@ -353,6 +405,12 @@ class Game2048 {
         }, { passive: false });
 
         document.addEventListener('touchend', (e) => {
+            // Reset pinching state
+            if (this.isPinching) {
+                this.isPinching = false;
+                this.pinchStartDistance = 0;
+            }
+            
             if (!this.isDragging) return;
             
             this.isDragging = false;
