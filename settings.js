@@ -341,4 +341,17 @@ document.addEventListener('DOMContentLoaded', () => {
             Sentry.configureScope(scope => scope.clear());
         }
     });
+    
+    // Dev mode toggle
+    const devModeToggle = document.getElementById('dev-mode');
+    devModeToggle.checked = localStorage.getItem('2048-dev-mode') === 'true';
+    
+    devModeToggle.addEventListener('change', (e) => {
+        const enabled = e.target.checked;
+        localStorage.setItem('2048-dev-mode', enabled ? 'true' : 'false');
+        
+        if (enabled) {
+            alert('Dev mode enabled! The app will check for updates every 30 seconds and auto-reload when a new version is deployed.');
+        }
+    });
 });

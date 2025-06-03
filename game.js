@@ -93,6 +93,7 @@ class Game2048 {
         this.setupEventListeners();
         this.setupBatteryMonitoring();
         this.setupVersionDisplay();
+        this.setupDevMode();
         
         // Check if launched from shortcut to start new game
         const urlParams = new URLSearchParams(window.location.search);
@@ -412,6 +413,103 @@ class Game2048 {
                 }
             });
         }
+    }
+
+    setupDevMode() {
+        // Check if dev mode is enabled
+        if (localStorage.getItem('2048-dev-mode') !== 'true') {
+            return;
+        }
+        
+        const currentVersion = window.APP_VERSION || 'v1.0.0';
+        let checkInterval;
+        
+        // Function to check for new version
+        const checkForUpdate = async () => {
+            try {
+                // Fetch config.js with cache bust to get latest version
+                const response = await fetch(`/config.js?t=${Date.now()}`, {
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    // Extract version from the config file
+                    const versionMatch = text.match(/window\.APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+                    
+                    if (versionMatch) {
+                        const remoteVersion = versionMatch[1];
+                        
+                        if (remoteVersion !== currentVersion) {
+                            console.log(`New version available: ${remoteVersion} (current: ${currentVersion})`);
+                            
+                            // Clear the interval to stop checking
+                            clearInterval(checkInterval);
+                            
+                            // Show notification before reload
+                            const notification = document.createElement('div');
+                            notification.style.cssText = `
+                                position: fixed;
+                                top: 50%;
+                                left: 50%;
+                                transform: translate(-50%, -50%);
+                                background: rgba(255, 107, 0, 0.9);
+                                color: white;
+                                padding: 20px 30px;
+                                border-radius: 10px;
+                                font-size: 18px;
+                                z-index: 10000;
+                                text-align: center;
+                                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                            `;
+                            notification.innerHTML = `
+                                <div>New version ${remoteVersion} available!</div>
+                                <div style="font-size: 14px; margin-top: 10px;">Reloading in 3 seconds...</div>
+                            `;
+                            document.body.appendChild(notification);
+                            
+                            // Reload after 3 seconds
+                            setTimeout(() => {
+                                window.location.reload(true);
+                            }, 3000);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Version check failed:', error);
+            }
+        };
+        
+        // Check immediately
+        checkForUpdate();
+        
+        // Then check every 30 seconds
+        checkInterval = setInterval(checkForUpdate, 30000);
+        
+        // Log that dev mode is active
+        console.log('Dev mode active - checking for updates every 30 seconds');
+        
+        // Also show a small indicator
+        const devIndicator = document.createElement('div');
+        devIndicator.style.cssText = `
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 0, 0, 0.2);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-family: monospace;
+            pointer-events: none;
+            z-index: 1000;
+        `;
+        devIndicator.textContent = 'DEV';
+        document.body.appendChild(devIndicator);
     }
 
     setupEventListeners() {
