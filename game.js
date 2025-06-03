@@ -155,8 +155,11 @@ class Game2048 {
     }
     
     updateBatteryBackground(level) {
-        // Only apply red background if battery is below 10% (0.1)
-        if (level <= 0.1) {
+        // Check if battery warning is enabled
+        const batteryWarningEnabled = localStorage.getItem('2048-battery-warning') !== 'false';
+        
+        // Only apply red background if battery is below 10% (0.1) and warning is enabled
+        if (batteryWarningEnabled && level <= 0.1) {
             // Calculate red intensity: 0% at 10% battery, 100% at 1% battery
             const redIntensity = 1 - (level / 0.1);
             
@@ -273,10 +276,11 @@ class Game2048 {
             e.preventDefault();
             
             // Check for double tap
+            const doubleTapUndoEnabled = localStorage.getItem('2048-double-tap-undo') !== 'false';
             const currentTime = Date.now();
             const timeSinceLastTap = currentTime - lastTapTime;
             
-            if (timeSinceLastTap < doubleTapThreshold && timeSinceLastTap > 50) {
+            if (doubleTapUndoEnabled && timeSinceLastTap < doubleTapThreshold && timeSinceLastTap > 50) {
                 // Double tap detected
                 this.undo();
                 lastTapTime = 0; // Reset to prevent triple tap
@@ -317,18 +321,21 @@ class Game2048 {
                     this.pinchStartDistance = currentDistance;
                 } else {
                     // Handle two-finger swipe for menu
-                    const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                    const deltaY = currentY - twoFingerStartY;
-                    
-                    if (Math.abs(deltaY) > 50) { // Threshold for swipe
-                        if (deltaY > 0) {
-                            // Swipe down - hide menu
-                            this.toggleMenu(false);
-                        } else {
-                            // Swipe up - show menu
-                            this.toggleMenu(true);
+                    const twoFingerMenuEnabled = localStorage.getItem('2048-two-finger-menu') !== 'false';
+                    if (twoFingerMenuEnabled) {
+                        const currentY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                        const deltaY = currentY - twoFingerStartY;
+                        
+                        if (Math.abs(deltaY) > 50) { // Threshold for swipe
+                            if (deltaY > 0) {
+                                // Swipe down - hide menu
+                                this.toggleMenu(false);
+                            } else {
+                                // Swipe up - show menu
+                                this.toggleMenu(true);
+                            }
+                            twoFingerStartY = currentY; // Reset for continuous swipes
                         }
-                        twoFingerStartY = currentY; // Reset for continuous swipes
                     }
                 }
                 return;

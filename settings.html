@@ -255,6 +255,44 @@
         </div>
         
         <div class="settings-section">
+            <h2>Hidden Features</h2>
+            <div style="margin: 20px auto; max-width: 400px;">
+                <label style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0; cursor: pointer;">
+                    <span style="color: rgba(255, 255, 255, 0.8); font-size: 16px;">Battery Warning</span>
+                    <input type="checkbox" id="battery-warning" style="width: 20px; height: 20px; cursor: pointer;">
+                </label>
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-bottom: 20px;">
+                    Show red overlay when battery is below 10%
+                </div>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0; cursor: pointer;">
+                    <span style="color: rgba(255, 255, 255, 0.8); font-size: 16px;">Double Tap to Undo</span>
+                    <input type="checkbox" id="double-tap-undo" style="width: 20px; height: 20px; cursor: pointer;">
+                </label>
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-bottom: 20px;">
+                    Double tap anywhere to undo last move
+                </div>
+                
+                <label style="display: flex; align-items: center; justify-content: space-between; margin: 15px 0; cursor: pointer;">
+                    <span style="color: rgba(255, 255, 255, 0.8); font-size: 16px;">Two-Finger Menu Toggle</span>
+                    <input type="checkbox" id="two-finger-menu" style="width: 20px; height: 20px; cursor: pointer;">
+                </label>
+                <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px; margin-bottom: 20px;">
+                    Swipe up/down with two fingers to show/hide menu
+                </div>
+                
+                <div class="slider-container" style="margin-top: 30px;">
+                    <div class="slider-label">Font Zoom Level</div>
+                    <div class="slider-value" id="zoom-value">100%</div>
+                    <input type="range" id="zoom-slider" min="50" max="200" step="10" value="100">
+                    <div style="color: rgba(255, 255, 255, 0.4); font-size: 14px;">
+                        Number size only (tiles stay same size, adjustable with pinch gesture)
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
             <h2>Performance Analytics</h2>
             
             <div class="stats">
@@ -364,6 +402,43 @@
         
         undoLevels.addEventListener('change', (e) => {
             localStorage.setItem('2048-undo-levels', e.target.value);
+        });
+        
+        // Handle hidden feature settings
+        const batteryWarning = document.getElementById('battery-warning');
+        const doubleTapUndo = document.getElementById('double-tap-undo');
+        const twoFingerMenu = document.getElementById('two-finger-menu');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomDisplay = document.getElementById('zoom-value');
+        
+        // Load saved hidden feature settings
+        batteryWarning.checked = localStorage.getItem('2048-battery-warning') !== 'false'; // Default to true
+        doubleTapUndo.checked = localStorage.getItem('2048-double-tap-undo') !== 'false'; // Default to true
+        twoFingerMenu.checked = localStorage.getItem('2048-two-finger-menu') !== 'false'; // Default to true
+        
+        // Load zoom level
+        const savedZoom = parseFloat(localStorage.getItem('2048-zoom') || '1') * 100;
+        zoomSlider.value = savedZoom;
+        zoomDisplay.textContent = `${Math.round(savedZoom)}%`;
+        
+        // Save hidden feature settings on change
+        batteryWarning.addEventListener('change', (e) => {
+            localStorage.setItem('2048-battery-warning', e.target.checked);
+        });
+        
+        doubleTapUndo.addEventListener('change', (e) => {
+            localStorage.setItem('2048-double-tap-undo', e.target.checked);
+        });
+        
+        twoFingerMenu.addEventListener('change', (e) => {
+            localStorage.setItem('2048-two-finger-menu', e.target.checked);
+        });
+        
+        // Update zoom on change
+        zoomSlider.addEventListener('input', (e) => {
+            const value = e.target.value;
+            zoomDisplay.textContent = `${value}%`;
+            localStorage.setItem('2048-zoom', (value / 100).toString());
         });
     </script>
     <script src="settings.js"></script>
