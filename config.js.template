@@ -15,5 +15,8 @@ window.ANALYTICS_CONFIG = {
     GA4_DEBUG_MODE: false,
     
     // Optional: Enable Sentry in development
-    SENTRY_TRACE_RATE: 0.1
+    SENTRY_TRACE_RATE: 0.1,
+    
+    // Optional: Session replay sampling rate
+    SENTRY_REPLAY_RATE: 0.1
 };

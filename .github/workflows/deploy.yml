@@ -30,7 +30,8 @@ jobs:
               GA4_ID: '${GA4_ID:-G-PLACEHOLDER_ID}',
               SENTRY_DSN: '${SENTRY_DSN:-}',
               GA4_DEBUG_MODE: false,
-              SENTRY_TRACE_RATE: 0.1
+              SENTRY_TRACE_RATE: 0.1,
+              SENTRY_REPLAY_RATE: 0.1
           };
           EOF
 

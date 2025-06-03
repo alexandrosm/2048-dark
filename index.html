@@ -95,10 +95,30 @@
                             dsn: window.ANALYTICS_CONFIG.SENTRY_DSN,
                             integrations: [
                                 new Sentry.BrowserTracing(),
+                                new Sentry.Replay({
+                                    // Mask all text content, but keep media playback
+                                    maskAllText: true,
+                                    maskAllInputs: true,
+                                    blockAllMedia: false,
+                                    // Sampling for privacy and performance
+                                    sessionSampleRate: window.ANALYTICS_CONFIG.SENTRY_REPLAY_RATE || 0.1,
+                                    errorSampleRate: 1.0
+                                })
                             ],
+                            // Performance Monitoring
                             tracesSampleRate: window.ANALYTICS_CONFIG.SENTRY_TRACE_RATE || 0.1,
+                            // Session Replay
+                            replaysSessionSampleRate: window.ANALYTICS_CONFIG.SENTRY_REPLAY_RATE || 0.1,
+                            replaysOnErrorSampleRate: 1.0,
+                            // Environment
                             environment: window.location.hostname === 'localhost' ? 'development' : 'production',
+                            // Privacy settings
+                            sendDefaultPii: false,
                             beforeSend: function(event, hint) {
+                                // Check privacy settings
+                                if (localStorage.getItem('2048-error-tracking-enabled') === 'false') {
+                                    return null;
+                                }
                                 // Filter out non-application errors
                                 if (event.exception && event.exception.values && event.exception.values[0]) {
                                     const error = event.exception.values[0];
@@ -115,6 +135,7 @@
                                 return event;
                             }
                         });
+                        console.log('Sentry initialized with tracing and replay');
                     } catch (e) {
                         console.log('Failed to initialize Sentry:', e);
                     }

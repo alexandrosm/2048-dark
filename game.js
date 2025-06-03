@@ -1077,6 +1077,9 @@ class Game2048 {
     }
 
     move(direction) {
+        // Start performance tracking
+        const moveStartTime = performance.now();
+        
         // Prevent multiple simultaneous moves
         if (this.moveInProgress) return;
         
@@ -1157,6 +1160,25 @@ class Game2048 {
                     }
                     
                     this.moveInProgress = false;
+                    
+                    // Track move performance
+                    const moveDuration = performance.now() - moveStartTime;
+                    if (typeof Sentry !== 'undefined' && Sentry.getCurrentHub) {
+                        const transaction = Sentry.getCurrentHub().getScope().getTransaction();
+                        if (transaction) {
+                            const span = transaction.startChild({
+                                op: 'game.move',
+                                description: `Move ${direction}`,
+                                data: {
+                                    direction,
+                                    score: this.score,
+                                    moveCount: movements.length
+                                }
+                            });
+                            span.setStatus('ok');
+                            span.finish();
+                        }
+                    }
                 }, 50);
             }, animationSpeed);
         } else {
