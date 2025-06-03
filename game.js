@@ -413,16 +413,33 @@ class Game2048 {
         
         const currentVersion = window.APP_VERSION || 'v1.0.0';
         let checkInterval;
+        let isReloading = false;
+        
+        // Check if we just reloaded for an update
+        const lastReloadVersion = sessionStorage.getItem('2048-dev-reload-version');
+        if (lastReloadVersion === currentVersion) {
+            // We just reloaded but still have the same version, wait longer before checking
+            setTimeout(() => {
+                sessionStorage.removeItem('2048-dev-reload-version');
+            }, 60000); // Wait 1 minute before allowing another reload
+        }
         
         // Function to check for new version
         const checkForUpdate = async () => {
+            if (isReloading || sessionStorage.getItem('2048-dev-reload-version')) {
+                return; // Skip if already reloading or just reloaded
+            }
+            
             try {
-                // Fetch config.js with cache bust to get latest version
-                const response = await fetch(`/config.js?t=${Date.now()}`, {
-                    cache: 'no-cache',
+                // Use a more specific URL to bypass any caching layers
+                const timestamp = Date.now();
+                const response = await fetch(`/config.js?_=${timestamp}&nocache=${Math.random()}`, {
+                    method: 'GET',
+                    cache: 'no-store',
                     headers: {
-                        'Cache-Control': 'no-cache',
-                        'Pragma': 'no-cache'
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
                     }
                 });
                 
@@ -434,11 +451,15 @@ class Game2048 {
                     if (versionMatch) {
                         const remoteVersion = versionMatch[1];
                         
-                        if (remoteVersion !== currentVersion) {
+                        if (remoteVersion !== currentVersion && remoteVersion !== lastReloadVersion) {
                             console.log(`New version available: ${remoteVersion} (current: ${currentVersion})`);
                             
-                            // Clear the interval to stop checking
+                            // Prevent multiple reloads
+                            isReloading = true;
                             clearInterval(checkInterval);
+                            
+                            // Store version we're reloading for
+                            sessionStorage.setItem('2048-dev-reload-version', currentVersion);
                             
                             // Show notification before reload
                             const notification = document.createElement('div');
@@ -462,9 +483,21 @@ class Game2048 {
                             `;
                             document.body.appendChild(notification);
                             
-                            // Reload after 3 seconds
+                            // Clear service worker cache if present
+                            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                                navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+                            }
+                            
+                            // Reload after 3 seconds with hard refresh
                             setTimeout(() => {
-                                window.location.reload(true);
+                                // Try to clear cache and reload
+                                if ('caches' in window) {
+                                    caches.keys().then(names => {
+                                        names.forEach(name => caches.delete(name));
+                                    });
+                                }
+                                // Force reload from server
+                                window.location.href = window.location.href.split('?')[0] + '?_=' + Date.now();
                             }, 3000);
                         }
                     }
