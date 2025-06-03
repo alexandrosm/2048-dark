@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "serve": "npx http-server -p 8080 -c-1"
+    "serve": "npx http-server -p 8080 -c-1",
+    "test": "./scripts/test.sh",
+    "lint": "for f in *.js; do echo \"Checking $f...\"; node -c \"$f\" || exit 1; done"
   },
   "keywords": [
     "2048",

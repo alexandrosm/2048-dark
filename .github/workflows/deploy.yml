@@ -20,6 +20,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Run tests
+        run: |
+          # Check JavaScript syntax
+          for file in *.js; do
+            if [ -f "$file" ] && [ "$file" != "config.js" ]; then
+              echo "Checking $file..."
+              node -c "$file" || exit 1
+            fi
+          done
+          
+          # Check for debugger statements
+          if grep -n "debugger" *.js 2>/dev/null; then
+            echo "Error: debugger statements found"
+            exit 1
+          fi
+          
+          echo "All tests passed!"
+
       - name: Create config.js from secrets
         env:
           GA4_ID: ${{ secrets.GA4_ID }}
