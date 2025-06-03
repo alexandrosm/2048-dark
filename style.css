@@ -255,6 +255,13 @@ button:focus {
     outline: none;
 }
 
+/* GitHub button styling */
+.github svg {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
 /* Dark level 1 adjustments */
 body.dark-level-1 .score {
     color: rgba(255, 255, 255, 0.15);

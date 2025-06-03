@@ -212,6 +212,10 @@ class Game2048 {
             this.toggleFullscreen();
         });
         
+        document.querySelector('.github').addEventListener('click', () => {
+            window.open('https://github.com/alexandrosm/2048-dark', '_blank');
+        });
+        
         document.querySelector('.new-game-overlay').addEventListener('click', () => {
             this.hideGameOver();
             this.startNewGame();
