@@ -803,7 +803,7 @@ class Game2048 {
         return tile;
     }
 
-    addNewTile() {
+    getEmptyCells() {
         const emptyCells = [];
         for (let row = 0; row < this.size; row++) {
             for (let col = 0; col < this.size; col++) {
@@ -812,6 +812,11 @@ class Game2048 {
                 }
             }
         }
+        return emptyCells;
+    }
+
+    addNewTile() {
+        const emptyCells = this.getEmptyCells();
 
         if (emptyCells.length > 0) {
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
@@ -1004,7 +1009,9 @@ class Game2048 {
             });
             rowTiles.sort((a, b) => a.col - b.col);
             
+            const newRowArray = Array(this.size).fill(0);
             let newCol = 0;
+            
             for (let i = 0; i < rowTiles.length; i++) {
                 const tile = rowTiles[i];
                 
@@ -1031,7 +1038,11 @@ class Game2048 {
                     this.score += tile.value * 2;
                     tile.merged = true;
                     rowTiles[i + 1].merged = true;
-                    i++;
+                    
+                    // Update grid with merged value
+                    newRowArray[newCol] = tile.value * 2;
+                    
+                    i++; // Skip the next tile
                 } else {
                     movements.push({
                         tile: tile,
@@ -1039,16 +1050,13 @@ class Game2048 {
                         newCol: newCol,
                         merged: false
                     });
+                    
+                    // Update grid with tile value
+                    newRowArray[newCol] = tile.value;
                 }
                 newCol++;
             }
             
-            const newRowArray = Array(this.size).fill(0);
-            rowTiles.forEach((tile, index) => {
-                if (index < newCol) {
-                    newRowArray[index] = tile.merged ? tile.value * 2 : tile.value;
-                }
-            });
             this.grid[row] = newRowArray;
         }
         
@@ -1068,7 +1076,9 @@ class Game2048 {
             });
             rowTiles.sort((a, b) => b.col - a.col);
             
+            const newRowArray = Array(this.size).fill(0);
             let newCol = this.size - 1;
+            
             for (let i = 0; i < rowTiles.length; i++) {
                 const tile = rowTiles[i];
                 
@@ -1095,7 +1105,11 @@ class Game2048 {
                     this.score += tile.value * 2;
                     tile.merged = true;
                     rowTiles[i + 1].merged = true;
-                    i++;
+                    
+                    // Update grid with merged value
+                    newRowArray[newCol] = tile.value * 2;
+                    
+                    i++; // Skip the next tile
                 } else {
                     movements.push({
                         tile: tile,
@@ -1103,18 +1117,13 @@ class Game2048 {
                         newCol: newCol,
                         merged: false
                     });
+                    
+                    // Update grid with tile value
+                    newRowArray[newCol] = tile.value;
                 }
                 newCol--;
             }
             
-            const newRowArray = Array(this.size).fill(0);
-            let colIndex = this.size - 1;
-            rowTiles.forEach((tile, index) => {
-                if (index < this.size - newCol) {
-                    newRowArray[colIndex] = tile.merged ? tile.value * 2 : tile.value;
-                    colIndex--;
-                }
-            });
             this.grid[row] = newRowArray;
         }
         
@@ -1161,7 +1170,11 @@ class Game2048 {
                     this.score += tile.value * 2;
                     tile.merged = true;
                     colTiles[i + 1].merged = true;
-                    i++;
+                    
+                    // Update grid with merged value
+                    this.grid[newRow][col] = tile.value * 2;
+                    
+                    i++; // Skip the next tile
                 } else {
                     movements.push({
                         tile: tile,
@@ -1169,14 +1182,16 @@ class Game2048 {
                         newCol: col,
                         merged: false
                     });
+                    
+                    // Update grid with tile value
+                    this.grid[newRow][col] = tile.value;
                 }
                 newRow++;
             }
             
-            for (let row = 0; row < this.size; row++) {
-                this.grid[row][col] = row < newRow ? 
-                    (colTiles[row] && colTiles[row].merged ? colTiles[row].value * 2 : (colTiles[row] ? colTiles[row].value : 0)) : 
-                    0;
+            // Fill remaining cells with 0
+            for (let row = newRow; row < this.size; row++) {
+                this.grid[row][col] = 0;
             }
         }
         
@@ -1223,7 +1238,11 @@ class Game2048 {
                     this.score += tile.value * 2;
                     tile.merged = true;
                     colTiles[i + 1].merged = true;
-                    i++;
+                    
+                    // Update grid with merged value
+                    this.grid[newRow][col] = tile.value * 2;
+                    
+                    i++; // Skip the next tile
                 } else {
                     movements.push({
                         tile: tile,
@@ -1231,18 +1250,16 @@ class Game2048 {
                         newCol: col,
                         merged: false
                     });
+                    
+                    // Update grid with tile value
+                    this.grid[newRow][col] = tile.value;
                 }
                 newRow--;
             }
             
-            let rowIndex = this.size - 1;
-            for (let row = this.size - 1; row >= 0; row--) {
-                this.grid[row][col] = rowIndex > newRow ? 
-                    (colTiles[this.size - 1 - rowIndex] && colTiles[this.size - 1 - rowIndex].merged ? 
-                        colTiles[this.size - 1 - rowIndex].value * 2 : 
-                        (colTiles[this.size - 1 - rowIndex] ? colTiles[this.size - 1 - rowIndex].value : 0)) : 
-                    0;
-                rowIndex--;
+            // Fill remaining cells with 0
+            for (let row = newRow; row >= 0; row--) {
+                this.grid[row][col] = 0;
             }
         }
         
