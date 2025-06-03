@@ -383,4 +383,12 @@ body.dark-level-1 .version-text {
     color: rgba(255, 255, 255, 0.2);
 }
 
+/* Show version brightly at max zoom */
+body.zoom-level-200 .version-text {
+    opacity: 1 !important;
+    color: rgba(255, 107, 0, 0.8) !important;
+    font-weight: 300;
+    text-shadow: 0 0 10px rgba(255, 107, 0, 0.3);
+}
+
 

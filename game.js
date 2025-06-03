@@ -83,6 +83,11 @@ class Game2048 {
         // Apply saved dark mode (only levels 0 and 1)
         document.body.className = `dark-level-${this.darkMode}`;
         
+        // Apply zoom level class if at max
+        if (this.zoomLevel >= 2.0) {
+            document.body.classList.add('zoom-level-200');
+        }
+        
         this.setupResponsiveSizing();
         this.setupGrid();
         this.setupEventListeners();
@@ -277,6 +282,13 @@ class Game2048 {
         // Save to localStorage
         localStorage.setItem('2048-zoom', this.zoomLevel.toString());
         
+        // Update body class for max zoom
+        if (this.zoomLevel >= 2.0) {
+            document.body.classList.add('zoom-level-200');
+        } else {
+            document.body.classList.remove('zoom-level-200');
+        }
+        
         // Reapply sizing with new zoom level
         this.setupResponsiveSizing();
     }
@@ -365,7 +377,11 @@ class Game2048 {
         if (versionDisplay && versionText) {
             // Set version from config or default
             const version = window.APP_VERSION || 'v1.0.0';
-            versionText.textContent = version.startsWith('v') ? version : `v${version}`;
+            const versionString = version.startsWith('v') ? version : `v${version}`;
+            versionText.textContent = versionString;
+            
+            // Set tooltip to show version
+            versionDisplay.title = `Version ${versionString}`;
             
             // Add mobile tap support
             let tapTimeout;
