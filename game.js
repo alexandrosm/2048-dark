@@ -76,7 +76,7 @@ class Game2048 {
     }
 
     init() {
-        // Apply saved dark mode (only levels 0 and 1)
+        // Apply saved dark mode (levels 0, 1, and 2)
         document.body.className = `dark-level-${this.darkMode}`;
         
         // Apply zoom level class if at max
@@ -1770,10 +1770,15 @@ class Game2048 {
     }
 
     toggleDarkMode() {
-        // Toggle between dark levels 0 and 1 only
-        this.darkMode = (this.darkMode + 1) % 2;
+        // Toggle between dark levels 0, 1, and 2 (normal, dark, bright)
+        this.darkMode = (this.darkMode + 1) % 3;
         document.body.className = `dark-level-${this.darkMode}`;
         localStorage.setItem('2048-darkmode', this.darkMode.toString());
+        
+        // Apply zoom level class if needed
+        if (this.zoomLevel >= 2.0) {
+            document.body.classList.add('zoom-level-200');
+        }
     }
     
     toggleFullscreen() {
@@ -1985,21 +1990,66 @@ class Game2048 {
         this.grid = state.grid;
         this.score = state.score;
         
-        // Clear existing tiles
-        this.tiles.forEach(tile => tile.element.remove());
-        this.tiles.clear();
+        // Create a map of current tiles by their position
+        const currentTilesByPos = new Map();
+        this.tiles.forEach(tile => {
+            const key = `${tile.row},${tile.col}`;
+            currentTilesByPos.set(key, tile);
+        });
         
-        // Recreate tiles from saved state
+        // Animate tiles back to their previous positions
         state.tiles.forEach(tileData => {
-            const tileElement = this.createTileElement(tileData.value, tileData.row, tileData.col);
-            this.tiles.set(tileData.id, {
-                id: tileData.id,
-                value: tileData.value,
-                row: tileData.row,
-                col: tileData.col,
-                element: tileElement,
-                merged: false
+            const key = `${tileData.row},${tileData.col}`;
+            let existingTile = null;
+            
+            // Find if this tile exists somewhere on the board
+            this.tiles.forEach(tile => {
+                if (tile.id === tileData.id) {
+                    existingTile = tile;
+                }
             });
+            
+            if (existingTile) {
+                // Animate existing tile back to its previous position
+                existingTile.row = tileData.row;
+                existingTile.col = tileData.col;
+                existingTile.element.style.left = `${this.getTileOffset(tileData.col)}px`;
+                existingTile.element.style.top = `${this.getTileOffset(tileData.row)}px`;
+                existingTile.element.dataset.row = tileData.row;
+                existingTile.element.dataset.col = tileData.col;
+            } else {
+                // Create new tile (for tiles that were merged)
+                const tileElement = this.createTileElement(tileData.value, tileData.row, tileData.col);
+                this.tiles.set(tileData.id, {
+                    id: tileData.id,
+                    value: tileData.value,
+                    row: tileData.row,
+                    col: tileData.col,
+                    element: tileElement,
+                    merged: false
+                });
+            }
+        });
+        
+        // Remove tiles that shouldn't exist after undo
+        const tilesToRemove = [];
+        this.tiles.forEach((tile, id) => {
+            const shouldExist = state.tiles.some(t => t.id === id);
+            if (!shouldExist) {
+                tilesToRemove.push(id);
+            }
+        });
+        
+        // Fade out and remove tiles that shouldn't exist
+        tilesToRemove.forEach(id => {
+            const tile = this.tiles.get(id);
+            if (tile) {
+                tile.element.style.opacity = '0';
+                setTimeout(() => {
+                    tile.element.remove();
+                    this.tiles.delete(id);
+                }, 150);
+            }
         });
         
         this.updateScore();

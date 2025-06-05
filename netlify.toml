@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "https://dark2048.netlify.app/*"
+  to = "https://dark2048.com/:splat"
+  status = 301
+  force = true

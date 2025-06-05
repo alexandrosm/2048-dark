@@ -1,0 +1,16 @@
+Cloudflare DNS Configuration for dark2048.com
+=============================================
+
+A Records (all proxied):
+  @ -> 185.199.108.153
+  @ -> 185.199.109.153
+  @ -> 185.199.110.153
+  @ -> 185.199.111.153
+
+CNAME Record (proxied):
+  www -> alexandrosm.github.io
+
+SSL/TLS Settings:
+  - Encryption mode: Full
+  - Always Use HTTPS: ON
+  - Automatic HTTPS Rewrites: ON

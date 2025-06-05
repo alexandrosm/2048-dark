@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Probability Slider Prototype</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: #f0f0f0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 40px 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #f59563;
+            margin-bottom: 40px;
+        }
+
+        .slider-container {
+            position: relative;
+            height: 250px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 40px;
+            margin-bottom: 30px;
+        }
+
+        .slider-track {
+            position: relative;
+            height: 8px;
+            background: #444;
+            border-radius: 4px;
+            margin-top: 100px;
+        }
+
+        .marker {
+            position: absolute;
+            top: -8px;
+            width: 24px;
+            height: 24px;
+            background: #f59563;
+            border-radius: 50%;
+            border: 3px solid #2a2a2a;
+            cursor: grab;
+            z-index: 10;
+            transform: translateX(-50%);
+            transition: transform 0.1s ease;
+        }
+
+        .marker:hover {
+            transform: translateX(-50%) scale(1.2);
+        }
+
+        .marker:active {
+            cursor: grabbing;
+            transform: translateX(-50%) scale(1.1);
+        }
+
+        .tile-label {
+            position: absolute;
+            top: -80px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #f0f0f0;
+            text-align: center;
+            white-space: nowrap;
+            transform: translateX(-50%);
+        }
+
+        .percent-label {
+            position: absolute;
+            top: 40px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #aaa;
+            text-align: center;
+            white-space: nowrap;
+            transform: translateX(-50%);
+        }
+
+        .reset-button {
+            display: block;
+            margin: 0 auto;
+            padding: 12px 24px;
+            background: #f59563;
+            color: #1a1a1a;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-button:hover {
+            background: #f67c5f;
+            transform: translateY(-2px);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+        }
+
+        .info {
+            text-align: center;
+            color: #888;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tile Probability Slider</h1>
+        
+        <div class="slider-container">
+            <div class="slider-track" id="track">
+                <!-- Markers will be created dynamically -->
+            </div>
+        </div>
+        
+        <button class="reset-button" onclick="resetSlider()">Reset</button>
+        
+        <div class="info">
+            Drag the markers to adjust tile spawn probabilities
+        </div>
+    </div>
+
+    <script>
+        // Start with just three markers: start, 2-tile, and 4-tile
+        let markers = [
+            { id: 'start', position: 0, tileValue: null },
+            { id: 'tile-2', position: 90, tileValue: 2 },
+            { id: 'tile-4', position: 100, tileValue: 4 }
+        ];
+
+        let activeMarker = null;
+        let sliderRect = null;
+
+        function initSlider() {
+            const track = document.getElementById('track');
+            sliderRect = track.getBoundingClientRect();
+            
+            // Create initial markers
+            createAllMarkers();
+            updateLabels();
+            
+            // Set up event listeners
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('touchmove', drag, { passive: false });
+            document.addEventListener('mouseup', endDrag);
+            document.addEventListener('touchend', endDrag);
+        }
+
+        function createAllMarkers() {
+            const track = document.getElementById('track');
+            
+            // Clear existing markers
+            track.querySelectorAll('.marker').forEach(m => m.remove());
+            
+            // Create new markers
+            markers.forEach(marker => {
+                const markerEl = document.createElement('div');
+                markerEl.className = 'marker';
+                markerEl.id = marker.id;
+                markerEl.style.left = marker.position + '%';
+                markerEl.addEventListener('mousedown', startDrag);
+                markerEl.addEventListener('touchstart', startDrag, { passive: false });
+                track.appendChild(markerEl);
+            });
+        }
+
+        function startDrag(e) {
+            e.preventDefault();
+            activeMarker = e.target;
+        }
+
+        function drag(e) {
+            if (!activeMarker) return;
+            
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const relativeX = clientX - sliderRect.left;
+            let percentage = Math.max(0, Math.min(100, (relativeX / sliderRect.width) * 100));
+            
+            // Find the marker being dragged
+            const markerIndex = markers.findIndex(m => m.id === activeMarker.id);
+            if (markerIndex === -1) return;
+            
+            // Apply constraints - can't pass neighboring markers
+            if (markerIndex > 0) {
+                percentage = Math.max(markers[markerIndex - 1].position + 1, percentage);
+            }
+            if (markerIndex < markers.length - 1) {
+                percentage = Math.min(markers[markerIndex + 1].position - 1, percentage);
+            }
+            
+            // Update position
+            markers[markerIndex].position = percentage;
+            activeMarker.style.left = percentage + '%';
+            
+            // Check if we need to handle edge cases
+            handleEdgeMarkers();
+            updateLabels();
+        }
+
+        function endDrag() {
+            if (activeMarker) {
+                handleMarkerCollisions();
+                activeMarker = null;
+            }
+        }
+
+        function handleEdgeMarkers() {
+            // Sort markers by position
+            markers.sort((a, b) => a.position - b.position);
+            
+            // Check left edge - if no marker at position 0, create new tile
+            if (markers[0].position > 1) {
+                // Find lowest tile value
+                const tilesWithValues = markers.filter(m => m.tileValue);
+                if (tilesWithValues.length > 0) {
+                    const lowestTile = Math.min(...tilesWithValues.map(m => m.tileValue));
+                    if (lowestTile >= 2) {
+                        const newTile = lowestTile / 2;
+                        markers.unshift({ 
+                            id: `tile-${newTile}`, 
+                            position: 0, 
+                            tileValue: newTile 
+                        });
+                        createAllMarkers();
+                    }
+                }
+            }
+            
+            // Check right edge - if rightmost tile moved, create new tile
+            const rightmost = markers[markers.length - 1];
+            if (rightmost.tileValue && rightmost.position < 99) {
+                // Find highest tile value
+                const highestTile = Math.max(...markers.filter(m => m.tileValue).map(m => m.tileValue));
+                const newTile = highestTile * 2;
+                markers.push({ 
+                    id: `tile-${newTile}`, 
+                    position: 100, 
+                    tileValue: newTile 
+                });
+                createAllMarkers();
+            }
+        }
+
+        function handleMarkerCollisions() {
+            // Check for markers that are too close together
+            markers.sort((a, b) => a.position - b.position);
+            
+            for (let i = 0; i < markers.length - 1; i++) {
+                if (Math.abs(markers[i].position - markers[i + 1].position) < 1) {
+                    // Remove the marker that was there originally (not the one being dragged)
+                    if (activeMarker && activeMarker.id === markers[i].id) {
+                        markers.splice(i + 1, 1);
+                    } else {
+                        markers.splice(i, 1);
+                    }
+                    i--; // Recheck this position
+                }
+            }
+            
+            createAllMarkers();
+            handleEdgeMarkers();
+            updateLabels();
+        }
+
+        function updateLabels() {
+            // Remove old labels
+            document.querySelectorAll('.tile-label, .percent-label').forEach(l => l.remove());
+            
+            const track = document.getElementById('track');
+            markers.sort((a, b) => a.position - b.position);
+            
+            // Create labels for each tile range
+            for (let i = 0; i < markers.length - 1; i++) {
+                const start = markers[i];
+                const end = markers[i + 1];
+                
+                if (end.tileValue) {
+                    const centerPos = (start.position + end.position) / 2;
+                    const percentage = Math.round(end.position - start.position);
+                    
+                    // Tile label
+                    const tileLabel = document.createElement('div');
+                    tileLabel.className = 'tile-label';
+                    tileLabel.style.left = centerPos + '%';
+                    tileLabel.textContent = `${end.tileValue} Tile`;
+                    track.appendChild(tileLabel);
+                    
+                    // Percentage label
+                    const percentLabel = document.createElement('div');
+                    percentLabel.className = 'percent-label';
+                    percentLabel.style.left = centerPos + '%';
+                    percentLabel.textContent = `${percentage}%`;
+                    track.appendChild(percentLabel);
+                }
+            }
+        }
+
+        function resetSlider() {
+            markers = [
+                { id: 'start', position: 0, tileValue: null },
+                { id: 'tile-2', position: 90, tileValue: 2 },
+                { id: 'tile-4', position: 100, tileValue: 4 }
+            ];
+            
+            createAllMarkers();
+            updateLabels();
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initSlider);
+    </script>
+</body>
+</html>

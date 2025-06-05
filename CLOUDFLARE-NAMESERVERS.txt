@@ -1,0 +1,16 @@
+Cloudflare Nameservers for dark2048.com
+========================================
+
+Your assigned nameservers:
+- lee.ns.cloudflare.com
+- raphaela.ns.cloudflare.com
+
+Steps to update at Gandi:
+1. Go to https://admin.gandi.net
+2. Click on "Domain" > "dark2048.com"
+3. Click "Nameservers" tab
+4. Select "External nameservers"
+5. Replace with Cloudflare's nameservers above
+6. Save changes
+
+DNS propagation will take 5 minutes to 2 hours.
