@@ -1,4 +1,4 @@
-const CACHE_NAME = '2048-dark-v31';
+const CACHE_NAME = '2048-dark-v32';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -61,6 +61,12 @@ self.addEventListener('fetch', event => {
       url.pathname.includes('node_modules')) {
     return;
   }
+  
+  // Skip external resources (CDNs, analytics, etc)
+  if (!url.hostname.includes(self.location.hostname) && 
+      !url.hostname.includes('github.io')) {
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request)
@@ -83,11 +89,17 @@ self.addEventListener('fetch', event => {
           return fetchResponse;
         });
       })
-      .catch(() => {
-        // Offline fallback
+      .catch(error => {
+        // Offline fallback for documents only
         if (event.request.destination === 'document') {
           return caches.match('/index.html');
         }
+        // For other resources, return a network error response
+        return new Response('Network error', {
+          status: 408,
+          statusText: 'Network error',
+          headers: new Headers({ 'Content-Type': 'text/plain' })
+        });
       })
   );
 });
