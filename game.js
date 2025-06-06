@@ -48,6 +48,64 @@ class Game2048 {
         this.pinchStartDistance = 0; // For pinch gesture tracking
         this.isPinching = false; // Track if we're in a pinch gesture
         this.isTwoFingerSwiping = false; // Track if we're in a two-finger swipe
+        this.gameMode = localStorage.getItem('2048-game-mode') || 'classic'; // Game mode: classic or fibonacci
+        console.log('Game mode:', this.gameMode);
+        
+        // Fibonacci sequence for fibonacci mode
+        this.fibSequence = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765];
+        
+        // Helper functions for Fibonacci mode
+        this.canFibMerge = (a, b) => {
+            // Special case: 1+1=2
+            if (a === 1 && b === 1) return true;
+            
+            // For Fibonacci merging, we need consecutive numbers that sum to the next
+            // Check all valid Fibonacci pairs
+            if ((a === 1 && b === 2) || (a === 2 && b === 1)) return true;  // 1+2=3
+            if ((a === 2 && b === 3) || (a === 3 && b === 2)) return true;  // 2+3=5
+            if ((a === 3 && b === 5) || (a === 5 && b === 3)) return true;  // 3+5=8
+            if ((a === 5 && b === 8) || (a === 8 && b === 5)) return true;  // 5+8=13
+            if ((a === 8 && b === 13) || (a === 13 && b === 8)) return true; // 8+13=21
+            if ((a === 13 && b === 21) || (a === 21 && b === 13)) return true; // 13+21=34
+            if ((a === 21 && b === 34) || (a === 34 && b === 21)) return true; // 21+34=55
+            if ((a === 34 && b === 55) || (a === 55 && b === 34)) return true; // 34+55=89
+            if ((a === 55 && b === 89) || (a === 89 && b === 55)) return true; // 55+89=144
+            if ((a === 89 && b === 144) || (a === 144 && b === 89)) return true; // 89+144=233
+            if ((a === 144 && b === 233) || (a === 233 && b === 144)) return true; // 144+233=377
+            if ((a === 233 && b === 377) || (a === 377 && b === 233)) return true; // 233+377=610
+            if ((a === 377 && b === 610) || (a === 610 && b === 377)) return true; // 377+610=987
+            if ((a === 610 && b === 987) || (a === 987 && b === 610)) return true; // 610+987=1597
+            if ((a === 987 && b === 1597) || (a === 1597 && b === 987)) return true; // 987+1597=2584
+            
+            return false;
+        };
+        
+        this.getFibMergeResult = (a, b) => {
+            // Simply add them together - this naturally produces the next Fibonacci number
+            return a + b;
+        };
+        
+        // Check if two tiles can merge based on game mode
+        this.canMergeTiles = (value1, value2) => {
+            if (this.gameMode === 'fibonacci') {
+                const canMerge = this.canFibMerge(value1, value2);
+                console.log(`Fibonacci mode: checking ${value1} + ${value2} = ${canMerge}`);
+                return canMerge;
+            } else {
+                return value1 === value2;
+            }
+        };
+        
+        // Get the result of merging two tiles
+        this.getMergedValue = (value1, value2) => {
+            if (this.gameMode === 'fibonacci') {
+                const result = this.getFibMergeResult(value1, value2);
+                console.log(`Fibonacci merge: ${value1} + ${value2} = ${result}`);
+                return result;
+            } else {
+                return value1 * 2;
+            }
+        };
         
         // Game history for debugging
         this.gameHistory = {
@@ -90,6 +148,20 @@ class Game2048 {
         this.setupBatteryMonitoring();
         this.setupVersionDisplay();
         this.setupDevMode();
+        
+        // Initialize game mode button
+        const modeButton = document.querySelector('.game-mode');
+        if (this.gameMode === 'fibonacci') {
+            modeButton.classList.add('fibonacci');
+            modeButton.title = 'Fibonacci Mode';
+            // Update header to show mode
+            const header = document.querySelector('.header h1');
+            if (header) header.textContent = '2048 Fibonacci';
+        } else {
+            modeButton.title = 'Classic Mode';
+            const header = document.querySelector('.header h1');
+            if (header) header.textContent = '2048';
+        }
         
         // Check if launched from shortcut to start new game
         const urlParams = new URLSearchParams(window.location.search);
@@ -536,6 +608,27 @@ class Game2048 {
         // Dev mode is active - checking for updates every 30 seconds
         // The DEV indicator is now shown in the version display
     }
+    
+    toggleGameMode() {
+        this.gameMode = this.gameMode === 'classic' ? 'fibonacci' : 'classic';
+        localStorage.setItem('2048-game-mode', this.gameMode);
+        
+        // Update button class and header
+        const modeButton = document.querySelector('.game-mode');
+        const header = document.querySelector('.header h1');
+        
+        if (this.gameMode === 'fibonacci') {
+            modeButton.classList.add('fibonacci');
+            modeButton.title = 'Fibonacci Mode';
+            if (header) header.textContent = '2048 Fibonacci';
+        } else {
+            modeButton.classList.remove('fibonacci');
+            modeButton.title = 'Classic Mode';
+            if (header) header.textContent = '2048';
+        }
+        
+        this.startNewGame();
+    }
 
     setupEventListeners() {
         document.addEventListener('keydown', (e) => this.handleKeyPress(e));
@@ -547,6 +640,10 @@ class Game2048 {
 
         document.querySelector('.undo').addEventListener('click', () => {
             this.undo();
+        });
+        
+        document.querySelector('.game-mode').addEventListener('click', () => {
+            this.toggleGameMode();
         });
         
         document.querySelector('.dark-mode').addEventListener('click', () => {
@@ -1212,22 +1309,27 @@ class Game2048 {
         if (emptyCells.length > 0) {
             const randomCell = emptyCells[Math.floor(Math.random() * emptyCells.length)];
             
-            // Check settings
-            const startWithOnes = localStorage.getItem('2048-start-with-ones') === 'true';
-            const luckyEights = localStorage.getItem('2048-lucky-eights') === 'true';
-            
             let value;
             const rand = Math.random();
             
-            // 1% chance for 8 if lucky eights is enabled
-            if (luckyEights && rand < 0.01) {
-                value = 8;
-            } else if (rand < 0.9) {
-                // 90% chance for base value (1 or 2)
-                value = startWithOnes ? 1 : 2;
+            if (this.gameMode === 'fibonacci') {
+                // Fibonacci mode: spawn 1 (90%) or 1 (10%) - yes, both are 1!
+                value = 1;
             } else {
-                // 10% (or 9% with lucky eights) chance for double value
-                value = startWithOnes ? 2 : 4;
+                // Classic mode
+                const startWithOnes = localStorage.getItem('2048-start-with-ones') === 'true';
+                const luckyEights = localStorage.getItem('2048-lucky-eights') === 'true';
+                
+                // 1% chance for 8 if lucky eights is enabled
+                if (luckyEights && rand < 0.01) {
+                    value = 8;
+                } else if (rand < 0.9) {
+                    // 90% chance for base value (1 or 2)
+                    value = startWithOnes ? 1 : 2;
+                } else {
+                    // 10% (or 9% with lucky eights) chance for double value
+                    value = startWithOnes ? 2 : 4;
+                }
             }
             
             this.grid[randomCell.row][randomCell.col] = value;
@@ -1395,7 +1497,8 @@ class Game2048 {
                 mergedWith.toBeRemoved = true;
                 
                 setTimeout(() => {
-                    tile.value *= 2;
+                    // Use the already calculated merged value from the grid
+                    tile.value = this.grid[tile.row][tile.col];
                     tile.element.textContent = tile.value;
                     tile.element.className = `tile tile-${tile.value}`;
                     
@@ -1404,9 +1507,6 @@ class Game2048 {
                         mergedWith.element.remove();
                     }
                     this.tiles.delete(mergedWith.id);
-                    
-                    // Update grid to reflect the new tile value
-                    this.grid[tile.row][tile.col] = tile.value;
                 }, animationSpeed);
             }
         });
@@ -1437,7 +1537,7 @@ class Game2048 {
                 const tile = rowTiles[i];
                 
                 if (i < rowTiles.length - 1 && 
-                    rowTiles[i].value === rowTiles[i + 1].value && 
+                    this.canMergeTiles(rowTiles[i].value, rowTiles[i + 1].value) && 
                     !rowTiles[i].merged && 
                     !rowTiles[i + 1].merged) {
                     
@@ -1456,12 +1556,13 @@ class Game2048 {
                         merged: false
                     });
                     
-                    this.score += tile.value * 2;
+                    const mergedValue = this.getMergedValue(tile.value, rowTiles[i + 1].value);
+                    this.score += mergedValue;
                     tile.merged = true;
                     rowTiles[i + 1].merged = true;
                     
                     // Update grid with merged value
-                    newRowArray[newCol] = tile.value * 2;
+                    newRowArray[newCol] = mergedValue;
                     
                     i++; // Skip the next tile
                 } else {
@@ -1504,7 +1605,7 @@ class Game2048 {
                 const tile = rowTiles[i];
                 
                 if (i < rowTiles.length - 1 && 
-                    rowTiles[i].value === rowTiles[i + 1].value && 
+                    this.canMergeTiles(rowTiles[i].value, rowTiles[i + 1].value) && 
                     !rowTiles[i].merged && 
                     !rowTiles[i + 1].merged) {
                     
@@ -1523,12 +1624,13 @@ class Game2048 {
                         merged: false
                     });
                     
-                    this.score += tile.value * 2;
+                    const mergedValue = this.getMergedValue(tile.value, rowTiles[i + 1].value);
+                    this.score += mergedValue;
                     tile.merged = true;
                     rowTiles[i + 1].merged = true;
                     
                     // Update grid with merged value
-                    newRowArray[newCol] = tile.value * 2;
+                    newRowArray[newCol] = mergedValue;
                     
                     i++; // Skip the next tile
                 } else {
@@ -1569,7 +1671,7 @@ class Game2048 {
                 const tile = colTiles[i];
                 
                 if (i < colTiles.length - 1 && 
-                    colTiles[i].value === colTiles[i + 1].value && 
+                    this.canMergeTiles(colTiles[i].value, colTiles[i + 1].value) && 
                     !colTiles[i].merged && 
                     !colTiles[i + 1].merged) {
                     
@@ -1588,12 +1690,13 @@ class Game2048 {
                         merged: false
                     });
                     
-                    this.score += tile.value * 2;
+                    const mergedValue = this.getMergedValue(tile.value, colTiles[i + 1].value);
+                    this.score += mergedValue;
                     tile.merged = true;
                     colTiles[i + 1].merged = true;
                     
                     // Update grid with merged value
-                    this.grid[newRow][col] = tile.value * 2;
+                    this.grid[newRow][col] = mergedValue;
                     
                     i++; // Skip the next tile
                 } else {
@@ -1637,7 +1740,7 @@ class Game2048 {
                 const tile = colTiles[i];
                 
                 if (i < colTiles.length - 1 && 
-                    colTiles[i].value === colTiles[i + 1].value && 
+                    this.canMergeTiles(colTiles[i].value, colTiles[i + 1].value) && 
                     !colTiles[i].merged && 
                     !colTiles[i + 1].merged) {
                     
@@ -1656,12 +1759,13 @@ class Game2048 {
                         merged: false
                     });
                     
-                    this.score += tile.value * 2;
+                    const mergedValue = this.getMergedValue(tile.value, colTiles[i + 1].value);
+                    this.score += mergedValue;
                     tile.merged = true;
                     colTiles[i + 1].merged = true;
                     
                     // Update grid with merged value
-                    this.grid[newRow][col] = tile.value * 2;
+                    this.grid[newRow][col] = mergedValue;
                     
                     i++; // Skip the next tile
                 } else {

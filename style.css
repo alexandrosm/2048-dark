@@ -41,6 +41,7 @@ body.dark-level-1 {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+
 .header.hidden {
     transform: translateY(-100%);
     opacity: 0;
@@ -172,6 +173,105 @@ body.dark-level-1 {
     transition: color 0.3s ease;
 }
 
+/* Fibonacci number tiles - green gradient like classic */
+.tile-3 {
+    color: rgba(255, 255, 255, 0.42);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-5 {
+    color: rgba(200, 255, 200, 0.47);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-13 {
+    color: rgba(150, 255, 150, 0.52);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-21 {
+    color: rgba(120, 255, 180, 0.57);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-34 {
+    color: rgba(100, 255, 160, 0.62);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-55 {
+    color: rgba(80, 255, 140, 0.67);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-89 {
+    color: rgba(60, 255, 120, 0.72);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-144 {
+    color: rgba(50, 255, 100, 0.77);
+    font-size: var(--font-size-small, 28px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-233 {
+    color: rgba(40, 255, 80, 0.82);
+    font-size: var(--font-size-small, 28px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-377 {
+    color: rgba(30, 255, 60, 0.87);
+    font-size: var(--font-size-small, 28px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-610 {
+    color: rgba(20, 255, 40, 0.92);
+    font-size: var(--font-size-small, 28px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-987 {
+    color: rgba(20, 255, 40, 0.92);
+    font-size: var(--font-size-small, 28px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-1597 {
+    color: rgba(20, 255, 40, 0.95);
+    font-size: var(--font-size-tiny, 24px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-2584 {
+    color: rgba(20, 255, 40, 0.98);
+    font-size: var(--font-size-tiny, 24px);
+    animation: appear 0.3s ease;
+    transition: color 0.3s ease;
+}
+
+.tile-4181 {
+    color: rgba(20, 255, 20, 1.0);
+    font-size: var(--font-size-tiny, 24px);
+    animation: appear 0.3s ease, glow 2s ease infinite;
+    transition: color 0.3s ease;
+}
+
 @keyframes appear {
     0% {
         transform: scale(0);
@@ -209,6 +309,7 @@ body.dark-level-1 {
 }
 
 
+/* Dark mode level 1 - classic tiles */
 body.dark-level-1 .tile-1 { color: rgba(255, 255, 255, 0.15); }
 body.dark-level-1 .tile-2 { color: rgba(255, 255, 255, 0.2); }
 body.dark-level-1 .tile-4 { color: rgba(255, 255, 200, 0.25); }
@@ -221,6 +322,23 @@ body.dark-level-1 .tile-256 { color: rgba(255, 100, 50, 0.55); }
 body.dark-level-1 .tile-512 { color: rgba(255, 80, 40, 0.6); }
 body.dark-level-1 .tile-1024 { color: rgba(255, 60, 30, 0.65); }
 body.dark-level-1 .tile-2048 { color: rgba(255, 40, 20, 0.7); }
+
+/* Dark mode level 1 - Fibonacci tiles */
+body.dark-level-1 .tile-3 { color: rgba(255, 255, 255, 0.22); }
+body.dark-level-1 .tile-5 { color: rgba(200, 255, 200, 0.27); }
+body.dark-level-1 .tile-13 { color: rgba(150, 255, 150, 0.32); }
+body.dark-level-1 .tile-21 { color: rgba(120, 255, 180, 0.37); }
+body.dark-level-1 .tile-34 { color: rgba(100, 255, 160, 0.42); }
+body.dark-level-1 .tile-55 { color: rgba(80, 255, 140, 0.47); }
+body.dark-level-1 .tile-89 { color: rgba(60, 255, 120, 0.52); }
+body.dark-level-1 .tile-144 { color: rgba(50, 255, 100, 0.57); }
+body.dark-level-1 .tile-233 { color: rgba(40, 255, 80, 0.62); }
+body.dark-level-1 .tile-377 { color: rgba(30, 255, 60, 0.67); }
+body.dark-level-1 .tile-610 { color: rgba(20, 255, 40, 0.72); }
+body.dark-level-1 .tile-987 { color: rgba(20, 255, 40, 0.77); }
+body.dark-level-1 .tile-1597 { color: rgba(20, 255, 40, 0.82); }
+body.dark-level-1 .tile-2584 { color: rgba(20, 255, 40, 0.87); }
+body.dark-level-1 .tile-4181 { color: rgba(20, 255, 20, 0.92); }
 
 .controls {
     margin-top: 20px;
@@ -400,53 +518,36 @@ body.dark-level-2 .score {
     color: rgba(255, 255, 255, 0.6);
 }
 
-body.dark-level-2 .tile-1 {
-    color: rgba(255, 255, 255, 0.5);
-}
+/* Bright mode - classic tiles */
+body.dark-level-2 .tile-1 { color: rgba(255, 255, 255, 0.5); }
+body.dark-level-2 .tile-2 { color: rgba(255, 255, 255, 0.6); }
+body.dark-level-2 .tile-4 { color: rgba(255, 255, 200, 0.65); }
+body.dark-level-2 .tile-8 { color: rgba(255, 200, 150, 0.7); }
+body.dark-level-2 .tile-16 { color: rgba(255, 180, 120, 0.75); }
+body.dark-level-2 .tile-32 { color: rgba(255, 160, 100, 0.8); }
+body.dark-level-2 .tile-64 { color: rgba(255, 140, 80, 0.85); }
+body.dark-level-2 .tile-128 { color: rgba(255, 120, 60, 0.9); }
+body.dark-level-2 .tile-256 { color: rgba(255, 100, 50, 0.95); }
+body.dark-level-2 .tile-512 { color: rgba(255, 80, 40, 1.0); }
+body.dark-level-2 .tile-1024 { color: rgba(255, 60, 30, 1.0); }
+body.dark-level-2 .tile-2048 { color: rgba(255, 40, 20, 1.0); }
 
-body.dark-level-2 .tile-2 {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-body.dark-level-2 .tile-4 {
-    color: rgba(255, 255, 200, 0.65);
-}
-
-body.dark-level-2 .tile-8 {
-    color: rgba(255, 200, 150, 0.7);
-}
-
-body.dark-level-2 .tile-16 {
-    color: rgba(255, 180, 120, 0.75);
-}
-
-body.dark-level-2 .tile-32 {
-    color: rgba(255, 160, 100, 0.8);
-}
-
-body.dark-level-2 .tile-64 {
-    color: rgba(255, 140, 80, 0.85);
-}
-
-body.dark-level-2 .tile-128 {
-    color: rgba(255, 120, 60, 0.9);
-}
-
-body.dark-level-2 .tile-256 {
-    color: rgba(255, 100, 50, 0.95);
-}
-
-body.dark-level-2 .tile-512 {
-    color: rgba(255, 80, 40, 1.0);
-}
-
-body.dark-level-2 .tile-1024 {
-    color: rgba(255, 60, 30, 1.0);
-}
-
-body.dark-level-2 .tile-2048 {
-    color: rgba(255, 40, 20, 1.0);
-}
+/* Bright mode - Fibonacci tiles */
+body.dark-level-2 .tile-3 { color: rgba(255, 255, 255, 0.58); }
+body.dark-level-2 .tile-5 { color: rgba(200, 255, 200, 0.63); }
+body.dark-level-2 .tile-13 { color: rgba(150, 255, 150, 0.68); }
+body.dark-level-2 .tile-21 { color: rgba(120, 255, 180, 0.73); }
+body.dark-level-2 .tile-34 { color: rgba(100, 255, 160, 0.78); }
+body.dark-level-2 .tile-55 { color: rgba(80, 255, 140, 0.83); }
+body.dark-level-2 .tile-89 { color: rgba(60, 255, 120, 0.88); }
+body.dark-level-2 .tile-144 { color: rgba(50, 255, 100, 0.93); }
+body.dark-level-2 .tile-233 { color: rgba(40, 255, 80, 0.98); }
+body.dark-level-2 .tile-377 { color: rgba(30, 255, 60, 1.0); }
+body.dark-level-2 .tile-610 { color: rgba(20, 255, 40, 1.0); }
+body.dark-level-2 .tile-987 { color: rgba(20, 255, 40, 1.0); }
+body.dark-level-2 .tile-1597 { color: rgba(20, 255, 40, 1.0); }
+body.dark-level-2 .tile-2584 { color: rgba(20, 255, 40, 1.0); }
+body.dark-level-2 .tile-4181 { color: rgba(20, 255, 20, 1.0); }
 
 body.dark-level-2 .version-text {
     color: rgba(255, 255, 255, 0.3);
@@ -462,6 +563,73 @@ body.dark-level-2 .version-text {
 .version-display.show-version .version-text,
 body.zoom-level-200 .version-text {
     /* DEV text will inherit the color */
+}
+
+/* Game mode button - Fibonacci spiral */
+.game-mode {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-mode svg {
+    width: 28px;
+    height: 28px;
+    transition: transform 0.3s ease;
+}
+
+.game-mode:hover svg {
+    transform: rotate(180deg);
+}
+
+.game-mode:hover {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Fibonacci mode active state */
+.game-mode.fibonacci {
+    color: #3bf65e;
+}
+
+.game-mode.fibonacci:hover {
+    color: #5ff67c;
+}
+
+/* Hide game mode button with controls when they're hidden */
+.controls.hidden ~ .game-mode {
+    transform: translateY(-100%);
+    opacity: 0;
+}
+
+/* Dark mode adjustments */
+body.dark-level-1 .game-mode {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark-level-1 .game-mode:hover {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-level-1 .game-mode.fibonacci {
+    color: rgba(59, 246, 94, 0.5);
+}
+
+body.dark-level-2 .game-mode.fibonacci {
+    color: #5ff67c;
 }
 
 
