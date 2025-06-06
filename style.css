@@ -452,4 +452,16 @@ body.dark-level-2 .version-text {
     color: rgba(255, 255, 255, 0.3);
 }
 
+/* Dev mode indicator styling in version text */
+.version-text {
+    letter-spacing: 0.5px;
+}
+
+/* Make DEV part slightly red when visible */
+.version-display:hover .version-text,
+.version-display.show-version .version-text,
+body.zoom-level-200 .version-text {
+    /* DEV text will inherit the color */
+}
+
 

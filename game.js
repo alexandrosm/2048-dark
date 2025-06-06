@@ -369,10 +369,13 @@ class Game2048 {
             // Set version from config or default
             const version = window.APP_VERSION || 'v1.0.0';
             const versionString = version.startsWith('v') ? version : `v${version}`;
-            versionText.textContent = versionString;
+            
+            // Add DEV indicator if in dev mode
+            const isDevMode = localStorage.getItem('2048-dev-mode') === 'true';
+            versionText.textContent = isDevMode ? `DEV ${versionString}` : versionString;
             
             // Set tooltip to show version
-            versionDisplay.title = `Version ${versionString}`;
+            versionDisplay.title = isDevMode ? `Development Mode - Version ${versionString}` : `Version ${versionString}`;
             
             // Add mobile tap support
             let tapTimeout;
@@ -531,24 +534,7 @@ class Game2048 {
         checkInterval = setInterval(checkForUpdate, 30000);
         
         // Dev mode is active - checking for updates every 30 seconds
-        
-        // Also show a small indicator
-        const devIndicator = document.createElement('div');
-        devIndicator.style.cssText = `
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(255, 0, 0, 0.2);
-            color: rgba(255, 255, 255, 0.5);
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 10px;
-            font-family: monospace;
-            pointer-events: none;
-            z-index: 1000;
-        `;
-        devIndicator.textContent = 'DEV';
-        document.body.appendChild(devIndicator);
+        // The DEV indicator is now shown in the version display
     }
 
     setupEventListeners() {

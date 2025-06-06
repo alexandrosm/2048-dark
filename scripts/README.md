@@ -1,6 +1,29 @@
 # Scripts
 
-This directory contains utility scripts for the 2048 game.
+This directory contains utility scripts for the 2048 Dark project.
+
+## Version Management Scripts
+
+### `check-version.sh`
+Comprehensive version checker that shows:
+- Current deployed version on dark2048.com
+- Local repository status
+- GitHub deployment status
+- Pending changes
+
+Usage:
+```bash
+./scripts/check-version.sh
+```
+
+### `get-version.sh`
+Simple script that returns just the version number.
+
+Usage:
+```bash
+VERSION=$(./scripts/get-version.sh)
+echo "Current version: v$VERSION"
+```
 
 ## Testing Scripts
 
@@ -67,6 +90,20 @@ chmod +x dns-setup.sh
 # Verify DNS propagation
 ./dns-setup.sh verify dark2048.com
 ```
+
+## HTTPS/SSL Scripts
+
+### `check-cloudflare.sh`
+Checks if the domain has moved to Cloudflare nameservers and if HTTPS is working.
+
+### `cloudflare-setup.py`
+Interactive Python script that helps with Cloudflare setup and checks DNS status.
+
+### `monitor-dns.sh`
+Monitors DNS propagation in real-time, checking every 30 seconds until Cloudflare is active.
+
+### `setup-cloudflare.sh`
+Step-by-step guide for setting up Cloudflare as an HTTPS proxy.
 
 ## Git Hooks
 
